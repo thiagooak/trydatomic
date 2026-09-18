@@ -58,10 +58,13 @@
       {:status 200
        :headers {"Content-Type" "application/json"}
        :body (json/write-str {out-name
-                              (->> in
+                              (try
+                                (->> in
                                   (run-q dataset)
                                   (pprint)
-                                  (with-out-str))})}))
+                                  (with-out-str))
+                                (catch Exception e (str e)))})}))
+
   (GET "/" _
     {:status 200
      :headers {"Content-Type" "text/html"}
