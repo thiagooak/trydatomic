@@ -1,35 +1,12 @@
 (ns app.db
-  (:import datomic.Util)
   (:require
    [clojure.java.io :as io]
-   [datomic.api :as d]))
+   [datomic.client.api :as d]
+   [clojure.edn :as edn]))
 
-(def db-uri-base "datomic:mem://")
-
-(defn scratch-conn
-  "Create a connection to an anonymous, in-memory database."
-  []
-  (let [uri (str db-uri-base (d/squuid))]
-    (d/delete-database uri)
-    (d/create-database uri)
-    (d/connect uri)))
-
-(defn read-all
-  "Read all forms in f, where f is any resource that can
-   be opened by io/reader"
-  [f]
-  (Util/readAll (io/reader f)))
-
-(defn transact-all
-  "Load and run all transactions from f, where f is any
-   resource that can be opened by io/reader."
-  [conn f]
-  (loop [n 0
-         [tx & more] (read-all f)]
-    (if tx
-      (recur (+ n (count (:tx-data  @(d/transact conn tx))))
-             more)
-      {:datoms n})))
+(def client (d/client {:server-type :datomic-local
+                       :storage-dir :mem
+                       :system "trydatomic"}))
 
 (defn safe-dataset? [dataset]
   (let [allowed #{"friends" "pokemon"}]
@@ -37,6 +14,16 @@
 
 (defn setup-db [conn dataset]
   (when-not (safe-dataset? dataset) (throw (Exception. "Unsafe Dataset")))
-  (doseq [schema [(str dataset ".edn")]]
-    (->> (io/resource schema)
-         (transact-all conn))))
+  (doseq [data (edn/read-string (slurp (io/resource (str dataset ".edn"))))]
+    (d/transact conn {:tx-data data})))
+
+(defn db-value
+  "Get a database value for a specific dataset"
+  [dataset]
+
+  (let [db-name dataset]
+    (d/delete-database client {db-name db-name})
+    (d/create-database client {db-name db-name})
+    (let [conn (d/connect client {db-name db-name})]
+      (setup-db conn dataset)
+      (d/db conn))))

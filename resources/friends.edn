@@ -1,3 +1,4 @@
+[
 ;; Attributes
 
 [{:db/ident :person/first-name
@@ -31,3 +32,5 @@
  {:person/first-name "Arthur" :person/last-name "Ramos"    :likes/food "tacos" :likes/drink "beer"}
  {:person/first-name "Noah"   :person/last-name "Silva"    :likes/food "curry" :likes/drink "beer"}
  {:person/first-name "Ben"    :person/last-name "Nursia"}]
+
+]

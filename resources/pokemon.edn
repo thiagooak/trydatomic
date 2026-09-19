@@ -1,3 +1,4 @@
+[
 ;; Attributes
 
 [{:db/ident :pokemon/number
@@ -186,3 +187,5 @@
  {:stat/hp 91, :stat/attack 134, :stat/speed 80, :pokemon/number "149", :stat/sp-defense 100, :stat/defense 95, :pokemon/name "Dragonite", :stat/sp-attack 100, :pokemon/type ["Dragon" "Flying"]}
  {:stat/hp 106, :stat/attack 110, :stat/speed 130, :pokemon/number "150", :stat/sp-defense 90, :stat/defense 90, :pokemon/name "Mewtwo", :stat/sp-attack 154, :pokemon/type ["Psychic"], :pokemon/category :legendary}
  {:stat/hp 100, :stat/attack 100, :stat/speed 100, :pokemon/number "151", :stat/sp-defense 100, :stat/defense 100, :pokemon/name "Mew", :stat/sp-attack 100, :pokemon/type ["Psychic"]}]
+
+ ]

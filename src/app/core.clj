@@ -6,7 +6,7 @@
             [clojure.data.json :as json]
             [clojure.pprint :refer [pprint]]
             [clojure.edn :as edn]
-            [datomic.api :as d]
+            [datomic.client.api :as d]
             [app.db]
             [app.ui]
             [app.content])
@@ -37,11 +37,10 @@
 
 (defn run-q [dataset q]
   (when-not (safe-q? q) (throw (Exception. "Unsafe Query")))
-  (let [conn (app.db/scratch-conn)]
-    (app.db/setup-db conn dataset)
-    (d/query {:query q
-              :timeout 500
-              :args [(d/db conn)]})))
+  (let [db (app.db/db-value dataset)]
+    (d/q {:query q
+          :timeout 500
+          :args [db]})))
 
 (defroutes routes
   ;; In a real system, you would serve static files from a CDN
