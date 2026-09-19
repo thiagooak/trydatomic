@@ -55,24 +55,31 @@
 (defn runnable [dataset input]
   (let [random-name (swap! runnable-counter inc)
         input-name (str "in" random-name)
-        output-name (str "out" random-name)]
+        output-name (str "out" random-name)
+        input-text (with-out-str (pprint input))]
 
     [:div {(str "data-signals:" input-name) (str "'" input "'")
            (str "data-signals:" output-name) "',,,'"}
-     [:code-highlighter {:language "clojure"
+     [:code-highlighter {:id input-name
+                         :language "clojure"
                          :contenteditable "plaintext-only"
                          :class "input"
                          :spellcheck "false"
+                         :data-initial input-text
                          "data-on-signal-patch" "el.highlight()"
                          "data-on-signal-patch-filter" (str "{include: /^" input-name "$/}")
                          "data-on:input" (str "$" input-name " = el.innerText")}
-      (with-out-str (pprint input))]
+      input-text]
 
      [:div
       [:button {"data-on:click__prevent" (str "@post('/api/q?dataset=" dataset "', {filterSignals: {include: /^" input-name "|" output-name "$/}})")
                 :style {:margin "5px"}}
        "Run"]
-      [:button {"data-on:click__prevent" (str "$" output-name " = ',,,'")
+      [:button {"data-on:click__prevent" (str "$" output-name " = ',,,';"
+                                              "el = document.getElementById('" input-name "');"
+                                              "el.textContent = el.dataset.initial;"
+                                              "el.highlight()"
+                                              )
                 :style {:margin "5px"}}
        "Reset"]]
 
