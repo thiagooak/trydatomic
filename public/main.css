@@ -25,6 +25,12 @@ body {
         sans-serif;
 }
 
+@media (prefers-color-scheme: dark) {
+    .logo {
+        filter: invert(1);
+    }
+}
+
 nav {
     flex: 1;
     margin-top: 5em;

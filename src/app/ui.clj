@@ -33,12 +33,15 @@
       [:link {:rel :stylesheet :href "https://cdn.jsdelivr.net/npm/@thiago.oak/code-highlighter@latest/prettylights.css"}]
       [:link {:rel :stylesheet :href (str "/main.css?v=" version)}]]
      [:body
+       [:header {:style {:display "flex" :align-items "center" :justify-content "center" :margin-top "1em"}}
+        [:img {:src "/eav.svg" :class "logo" :width 50 :height 50 :style {:margin-right "10px"}}]
+        [:p {:style {:font-size "2em" :margin 0}} [:span {:style {:font-weight "bold"}} "try"] "datomic"]]
       [:div {:style {:display "flex"}} nav
       [:main children]]
-      [:footer
+      [:footer {:style {:text-align "center"}}
        "This website is not associated with Nubank or Datomic"
-       " • "
-       [:a {:href "https://github.com/thiagooak/learn-datalog"} "GitHub"]]
+       [:br]
+       [:a {:href "https://github.com/thiagooak/trydatomic"} "Source Code"]]
       [:script {:async true :src "https://www.googletagmanager.com/gtag/js?id=G-BMHSZQLLJ1"}]
       [:script (h/raw "window.dataLayer = window.dataLayer || [];
                 function gtag () {dataLayer.push (arguments);}
