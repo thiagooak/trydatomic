@@ -18,23 +18,28 @@
     [?e :stat/speed ?speed]
     [(> ?speed 100)]]]
   [:p "Each result row contains a single map. "
-   "This is especially useful when returning wide entities — "
-   "compare pull with the equivalent multi-variable find:"]
-  [:ui/code ";;  multi-variable :find — verbose for many attributes
-[:find ?name ?hp ?attack ?defense ?sp-attack ?sp-defense ?speed
- :where [?e :pokemon/name ?name]
-        [?e :stat/hp ?hp]
-        [?e :stat/attack ?attack]
-        [?e :stat/defense ?defense]
-        [?e :stat/sp-attack ?sp-attack]
-        [?e :stat/sp-defense ?sp-defense]
-        [?e :stat/speed ?speed]]
-
-;; pull — concise, same result shape
-[:find (pull ?e [:pokemon/name :stat/hp :stat/attack :stat/defense
-                 :stat/sp-attack :stat/sp-defense :stat/speed])
- :where [?e :stat/speed ?speed]
-        [(> ?speed 100)]]"]
+   "This is especially useful when returning wide entities. "
+   "Without pull, every attribute needs its own variable in " [:code ":find"]
+   " and its own clause in " [:code ":where"] ", and each row is a flat tuple:"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?hp ?attack ?defense ?sp-attack ?sp-defense ?speed
+    :where
+    [?e :pokemon/name ?name]
+    [?e :stat/hp ?hp]
+    [?e :stat/attack ?attack]
+    [?e :stat/defense ?defense]
+    [?e :stat/sp-attack ?sp-attack]
+    [?e :stat/sp-defense ?sp-defense]
+    [?e :stat/speed ?speed]
+    [(> ?speed 100)]]]
+  [:p "With pull, the same Pokemon and attributes need one expression, "
+   "and each row is a map that names its own values:"]
+  [:ui/runnable "pokemon"
+   [:find (pull ?e [:pokemon/name :stat/hp :stat/attack :stat/defense
+                    :stat/sp-attack :stat/sp-defense :stat/speed])
+    :where
+    [?e :stat/speed ?speed]
+    [(> ?speed 100)]]]
 
   [:h2 "Wildcard pull"]
   [:p "Use " [:code "[*]"] " to pull every attribute on the entity, "
@@ -46,16 +51,66 @@
   [:p "The wildcard is handy for exploration and debugging. "
    "In production code, prefer listing attributes explicitly "
    "so the shape of your data is clear and stable."]
+  [:p "For a Pokemon that evolves, like Pikachu, a wildcard pull also returns " [:code ":evolution/next"] ". "
+   "That attribute is a reference to another entity, so all a wildcard gives you is its " [:code ":db/id"] ". "
+   "The sections below show how to follow it."]
 
   [:h2 "Pull with scalar find spec"]
   [:p "Combine pull with the scalar find spec (" [:code "."] ") "
-   "to get a single entity map with no wrapping set or tuple:"]
+   "to get a single entity map with no wrapping collection or tuple:"]
   [:ui/runnable "pokemon"
    [:find (pull ?e [:pokemon/name :pokemon/number
                     :pokemon/type :stat/hp :stat/speed]) .
     :where
     [?e :pokemon/name "Pikachu"]]]
   [:p "The result is a bare map — easy to pass directly to the rest of your application."]
+
+  [:h2 "Attribute options"]
+  [:p "Wrap an attribute in a list to give it options. "
+   [:code ":as"] " renames the key in the result, "
+   [:code ":limit"] " caps how many values a cardinality-many attribute returns, "
+   "and " [:code ":default"] " supplies a value when the entity doesn't have the attribute at all:"]
+  [:ui/runnable "pokemon"
+   [:find (pull ?e [(:pokemon/name :as "name")
+                    (:pokemon/type :limit 1)
+                    (:pokemon/category :default :none)])
+    :where
+    [?e :pokemon/name "Bulbasaur"]]]
+  [:p "Bulbasaur has two types, but " [:code ":limit 1"] " returns only one of them, and it has no "
+   [:code ":pokemon/category"] ", so the default is used."]
+
+  [:h2 "Following references"]
+  [:p [:code ":evolution/next"] " is a reference: its value is another entity. "
+   "To pull that entity too, put the attribute in a map with a pattern for the entity it points at:"]
+  [:ui/runnable "pokemon"
+   [:find (pull ?e [:pokemon/name
+                    {:evolution/next [:pokemon/name :pokemon/number]}])
+    :where
+    [?e :pokemon/name "Charmander"]]]
+  [:p "The value of " [:code ":evolution/next"] " is now a collection of maps, one for each Pokemon "
+   "Charmander evolves into, and each map follows the pattern we gave it."]
+
+  [:h2 "Reverse lookups"]
+  [:p "Put an underscore in front of the attribute name to follow a reference backwards. "
+   [:code ":evolution/_next"] " finds the entities whose " [:code ":evolution/next"] " points at this one:"]
+  [:ui/runnable "pokemon"
+   [:find (pull ?e [:pokemon/name
+                    {:evolution/_next [:pokemon/name]}])
+    :where
+    [?e :pokemon/name "Charizard"]]]
+  [:p "Charizard evolves from Charmeleon. Nothing had to be stored twice: "
+   "a reference can be followed in either direction."]
+
+  [:h2 "Recursion"]
+  [:p "Use " [:code "..."] " instead of a pattern to follow the same reference again and again, "
+   "for as long as there is something to follow. "
+   "A number, like " [:code "{:evolution/next 2}"] ", limits how many levels to follow:"]
+  [:ui/runnable "pokemon"
+   [:find (pull ?e [:pokemon/name
+                    {:evolution/next ...}])
+    :where
+    [?e :pokemon/name "Charmander"]]]
+  [:p "This gives Charmander's whole evolution line as a nested map."]
   [:ui/try-tip
-   [:p "Add " [:code ":stat/attack"] " and " [:code ":stat/defense"] " to the selective pull pattern. "
-    "Or use " [:code "[*]"] " on a different Pokemon like \"Snorlax\" to explore all of its stored attributes."]]]}
+   [:p "Change " [:code "\"Charmander\""] " to " [:code "\"Eevee\""] " in the recursive pull to see it branch three ways. "
+    "Or add " [:code ":stat/attack"] " and " [:code ":stat/defense"] " to the selective pull pattern at the top of this page."]]]}

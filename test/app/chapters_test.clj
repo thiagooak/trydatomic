@@ -78,20 +78,23 @@
     (is (not (re-find #"<a [^>]*>(← )?(Previous|Next)( Chapter)?( →)?</a>" html)) slug)))
 
 (defn- runnables
-  "[dataset query-string] for every runnable in an unexpanded chapter file."
+  "[dataset forms] for every runnable in an unexpanded chapter file. `forms` is
+  the query followed by its inputs, as written in the chapter."
   [slug]
   (let [raw (edn/read-string (slurp (io/resource (str "chapters/" slug ".edn"))))
         found (atom [])]
     (walk/postwalk (fn [form]
                      (when (and (vector? form) (= :ui/runnable (first form)))
-                       (swap! found conj [(second form) (pr-str (nth form 2))]))
+                       (swap! found conj [(second form) (drop 2 form)]))
                      form)
                    raw)
     @found))
 
 (deftest every-runnable-query-is-safe-and-runs
   (doseq [chapter (chapters/load-chapters)
-          [dataset query] (runnables (:slug chapter))]
-    (testing (str (:slug chapter) " " query)
-      (is (core/safe-q? (edn/read-string query)))
-      (is (some? (core/run-q dataset query))))))
+          [dataset forms] (runnables (:slug chapter))
+          :let [text (apply ui/editor-text forms)]]
+    (testing (str (:slug chapter) " " text)
+      (is (apply core/safe-q? forms))
+      ;; what the Run button posts: the text in the editor
+      (is (some? (core/run-q dataset text))))))

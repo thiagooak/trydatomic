@@ -45,6 +45,10 @@
    ". Every fact in the database is stored following this Entity-Attribute-Value structure. "
    "Attributes are themselves entities, which is why we can traverse from "
    [:code "?attribute-id"] " to " [:code ":db/ident"] " to get the keyword name."]
+  [:p "You may notice one more attribute for Bulbasaur, " [:code ":evolution/next"] ". "
+   "Its value is a number: the entity ID of Ivysaur. This is a " [:strong "reference"]
+   " from one entity to another, and we will follow it in the " [:a {:href "/pull"} "Pull"]
+   " and " [:a {:href "/rules"} "Rules"] " chapters."]
   [:p "Try changing \"Bulbasaur\" to another Pokemon name in the queries above."]
   [:p "Take a look at the "
    [:a {:href "https://github.com/thiagooak/learn-datalog/blob/main/resources/pokemon.edn"} "EDN file"]

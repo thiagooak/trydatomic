@@ -1,5 +1,6 @@
 (ns app.ui
-  (:require [clojure.pprint :refer [pprint]]
+  (:require [clojure.data.json :as json]
+            [clojure.pprint :refer [pprint]]
             [clojure.java.io :as io]
             [hiccup2.core :as h]
             [hiccup.page :as p]))
@@ -94,13 +95,22 @@
 
 (def runnable-counter (atom 0))
 
-(defn runnable [dataset input]
+(defn editor-text
+  "The text in a runnable's editor: the query, then any inputs in the order of
+  :in (after $). The server reads it back as the query followed by its inputs."
+  [query & inputs]
+  (str (with-out-str (pprint query))
+       (when (seq inputs)
+         (str "\n;; inputs, in the order of :in (after $)\n"
+              (apply str (map #(with-out-str (pprint %)) inputs))))))
+
+(defn runnable [dataset query & inputs]
   (let [random-name (swap! runnable-counter inc)
         input-name (str "in" random-name)
         output-name (str "out" random-name)
-        input-text (with-out-str (pprint input))]
+        input-text (apply editor-text query inputs)]
 
-    [:div {(str "data-signals:" input-name) (str "'" input "'")
+    [:div {(str "data-signals:" input-name) (json/write-str input-text :escape-slash false :escape-unicode false)
            (str "data-signals:" output-name) "',,,'"
            :style {:border "2px solid var(--ink)"
                    :margin "28px 0 36px"

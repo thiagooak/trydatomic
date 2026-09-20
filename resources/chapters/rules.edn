@@ -3,99 +3,104 @@
  [:div
   [:h1 "Rules"]
   [:p "Rules let you name and reuse a group of " [:code ":where"] " clauses. "
-   "Think of them as parameterised predicates — once defined, a rule can be invoked "
+   "Think of them as parameterised predicates: once defined, a rule can be invoked "
    "anywhere in a query just like a built-in clause. "
    "They keep complex queries readable and make shared logic easy to compose."]
 
   [:h2 "Defining and using a rule"]
   [:p "A rule is a vector of " [:em "rule heads"] ". "
    "Each head is itself a vector whose first element is the rule name and parameter list, "
-   "followed by the body clauses:"]
-  [:ui/code "(def rules
-  '[;; (strong? ?e) — true when attack AND speed are both above 80
-    [(strong? ?e)
+   "followed by the body clauses. Rules are passed to the query as an input, "
+   "using the special " [:code "%"] " binding, and invoked in " [:code ":where"] " like any other clause. "
+   "In Clojure that looks like this:"]
+  [:ui/code "clojure"
+   "(def rules
+  '[[(strong? ?e)
      [?e :stat/attack ?attack]
      [?e :stat/speed  ?speed]
      [(> ?attack 80)]
-     [(> ?speed  80)]]])"]
-  [:p "Rules are passed to " [:code "d/q"] " via the special " [:code "%"] " input binding "
-   "and invoked in " [:code ":where"] " like any other clause:"]
-  [:ui/code "(d/q '[:find ?name
+     [(> ?speed  80)]]])
+
+(d/q '[:find ?name
        :in   $ %
        :where (strong? ?e)
               [?e :pokemon/name ?name]]
      db rules)"]
-  [:p "The equivalent inline query — without rules — produces the same result "
-   "and can be run here:"]
+  [:p "In the editor below the rules are the input after the query, so you can edit them too. "
+   "This rule is true for a Pokemon when both its attack and its speed are above 80:"]
   [:ui/runnable "pokemon"
    [:find ?name
+    :in $ %
     :where
-    [?e :pokemon/name ?name]
-    [?e :stat/attack ?attack]
-    [?e :stat/speed ?speed]
-    [(> ?attack 80)]
-    [(> ?speed 80)]]]
+    (strong? ?e)
+    [?e :pokemon/name ?name]]
+   [[(strong? ?e)
+     [?e :stat/attack ?attack]
+     [?e :stat/speed ?speed]
+     [(> ?attack 80)]
+     [(> ?speed 80)]]]]
   [:p "Rules become especially valuable when the same set of clauses is needed "
    "in multiple queries, or when you want to give a complex condition a meaningful name."]
 
-  [:h2 "Multiple heads — rule-level OR"]
+  [:h2 "Multiple heads: rule-level OR"]
   [:p "A rule name can have more than one head. "
    "Datomic treats multiple heads as a " [:em "disjunction"] ": "
    "the rule succeeds if " [:em "any"] " head's body matches. "
    "This gives you named OR logic without repeating " [:code "or-join"] " everywhere:"]
-  [:ui/code "(def rules
-  '[;; succeeds if the Pokemon is very fast OR hits very hard
-    [(fast-or-strong? ?e)
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :in $ %
+    :where
+    (fast-or-strong? ?e)
+    [?e :pokemon/name ?name]]
+   [[(fast-or-strong? ?e)
      [?e :stat/speed ?speed]
      [(> ?speed 110)]]
     [(fast-or-strong? ?e)
      [?e :stat/attack ?attack]
-     [(> ?attack 110)]]])"]
-  [:ui/code "(d/q '[:find ?name
-       :in   $ %
-       :where (fast-or-strong? ?e)
-              [?e :pokemon/name ?name]]
-     db rules)"]
-  [:p "Equivalent runnable query using " [:code "or-join"] ":"]
-  [:ui/runnable "pokemon"
-   [:find ?name
-    :where
-    [?e :pokemon/name ?name]
-    (or-join [?e]
-             (and [?e :stat/speed ?speed]   [(> ?speed 110)])
-             (and [?e :stat/attack ?attack] [(> ?attack 110)]))]]
+     [(> ?attack 110)]]]]
 
   [:h2 "Recursive rules"]
   [:p "A rule can invoke itself, giving you recursive logic that Datomic evaluates "
-   "to a fixpoint — it keeps applying the rule until no new facts are derived. "
+   "to a fixpoint: it keeps applying the rule until no new facts are derived. "
    "The canonical example is reachability in a graph."]
-  [:p "Suppose you had an " [:code ":evolution/next"] " attribute linking each Pokemon "
-   "to its evolution. A recursive rule could find all reachable evolutions from any starting point:"]
-  [:ui/code ";; (evolves-into? ?ancestor ?descendant)
-(def evolution-rules
-  '[;; base case: direct evolution
-    [(evolves-into? ?a ?b)
+  [:p "In our data, " [:code ":evolution/next"] " links each Pokemon to the ones it evolves into. "
+   "A recursive rule can follow those links as far as they go. "
+   "The first head is the base case, a direct evolution. "
+   "The second says that a Pokemon also evolves into whatever its evolution evolves into:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :in $ %
+    :where
+    [?start :pokemon/name "Bulbasaur"]
+    (evolves-into? ?start ?descendant)
+    [?descendant :pokemon/name ?name]]
+   [[(evolves-into? ?a ?b)
      [?a :evolution/next ?b]]
-    ;; recursive case: transitive evolution
     [(evolves-into? ?a ?c)
      [?a :evolution/next ?b]
-     (evolves-into? ?b ?c)]])"]
-  [:ui/code ";; Find everything Bulbasaur eventually evolves into
-(d/q '[:find ?name
-       :in   $ %
-       :where [?bulbasaur :pokemon/name \"Bulbasaur\"]
-              (evolves-into? ?bulbasaur ?descendant)
-              [?descendant :pokemon/name ?name]]
-     db evolution-rules)
-;; => #{[\"Ivysaur\"] [\"Venusaur\"]}"]
-  [:p "The " [:code ":evolution/next"] " attribute is not in our Pokemon dataset, "
-   "but the pattern applies to any directed graph stored in Datomic — "
-   "org hierarchies, dependency trees, category taxonomies, and more."]
+     (evolves-into? ?b ?c)]]]
+  [:p "Ivysaur is a direct evolution, and Venusaur is reached through Ivysaur."]
   [:p "One important constraint: every recursive rule must have a " [:em "base case"] " "
    "(a non-recursive head) that eventually terminates the recursion. "
    "Datomic stops when a full pass through all rule heads derives no new results."]
+
+  [:h2 "Rules run in both directions"]
+  [:p "A rule doesn't say which side is the input. "
+   "The same " [:code "evolves-into?"] " rule can start from the descendant and find its ancestors:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :in $ %
+    :where
+    [?end :pokemon/name "Venusaur"]
+    (evolves-into? ?ancestor ?end)
+    [?ancestor :pokemon/name ?name]]
+   [[(evolves-into? ?a ?b)
+     [?a :evolution/next ?b]]
+    [(evolves-into? ?a ?c)
+     [?a :evolution/next ?b]
+     (evolves-into? ?b ?c)]]]
   [:ui/try-tip
-   [:p "Modify the " [:code "strong?"] " inline query to require both attack > 90 "
-    [:em "and"] " speed > 90 — see how many Pokemon meet both criteria. "
-    "Or change the " [:code "or-join"] " query to find Pokemon with attack > 130 "
-    [:em "or"] " special attack > 130."]]]}
+   [:p "Change " [:code "\"Bulbasaur\""] " to " [:code "\"Eevee\""] " in the recursive query to see it branch. "
+    "Or edit the " [:code "strong?"] " rule to require both attack > 90 "
+    [:em "and"] " speed > 90, and see how many Pokemon meet both criteria."]]]}

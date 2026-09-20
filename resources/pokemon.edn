@@ -3,7 +3,8 @@
 
 [{:db/ident :pokemon/number
   :db/valueType :db.type/string
-  :db/cardinality :db.cardinality/one}
+  :db/cardinality :db.cardinality/one
+  :db/unique :db.unique/identity}
  {:db/ident :pokemon/name
   :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one}
@@ -31,7 +32,11 @@
  {:db/ident :pokemon/category
   :db/valueType :db.type/keyword
   :db/cardinality :db.cardinality/one
-  :db/doc "Legendary, Mythical, etc"}]
+  :db/doc "Legendary, Mythical, etc"}
+ {:db/ident :evolution/next
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/many
+  :db/doc "The Pokemon this one evolves into"}]
 
 ;; Data
 ; https://pokemondb.net/tools/text-list
@@ -188,4 +193,77 @@
  {:stat/hp 106, :stat/attack 110, :stat/speed 130, :pokemon/number "150", :stat/sp-defense 90, :stat/defense 90, :pokemon/name "Mewtwo", :stat/sp-attack 154, :pokemon/type ["Psychic"], :pokemon/category :legendary}
  {:stat/hp 100, :stat/attack 100, :stat/speed 100, :pokemon/number "151", :stat/sp-defense 100, :stat/defense 100, :pokemon/name "Mew", :stat/sp-attack 100, :pokemon/type ["Psychic"]}]
 
- ]
+;; Evolutions. Each Pokemon points at the ones it evolves into (Gen 1 only)
+; https://pokemondb.net/evolution
+[{:pokemon/number "001" :evolution/next [[:pokemon/number "002"]]}
+ {:pokemon/number "002" :evolution/next [[:pokemon/number "003"]]}
+ {:pokemon/number "004" :evolution/next [[:pokemon/number "005"]]}
+ {:pokemon/number "005" :evolution/next [[:pokemon/number "006"]]}
+ {:pokemon/number "007" :evolution/next [[:pokemon/number "008"]]}
+ {:pokemon/number "008" :evolution/next [[:pokemon/number "009"]]}
+ {:pokemon/number "010" :evolution/next [[:pokemon/number "011"]]}
+ {:pokemon/number "011" :evolution/next [[:pokemon/number "012"]]}
+ {:pokemon/number "013" :evolution/next [[:pokemon/number "014"]]}
+ {:pokemon/number "014" :evolution/next [[:pokemon/number "015"]]}
+ {:pokemon/number "016" :evolution/next [[:pokemon/number "017"]]}
+ {:pokemon/number "017" :evolution/next [[:pokemon/number "018"]]}
+ {:pokemon/number "019" :evolution/next [[:pokemon/number "020"]]}
+ {:pokemon/number "021" :evolution/next [[:pokemon/number "022"]]}
+ {:pokemon/number "023" :evolution/next [[:pokemon/number "024"]]}
+ {:pokemon/number "025" :evolution/next [[:pokemon/number "026"]]}
+ {:pokemon/number "027" :evolution/next [[:pokemon/number "028"]]}
+ {:pokemon/number "029" :evolution/next [[:pokemon/number "030"]]}
+ {:pokemon/number "030" :evolution/next [[:pokemon/number "031"]]}
+ {:pokemon/number "032" :evolution/next [[:pokemon/number "033"]]}
+ {:pokemon/number "033" :evolution/next [[:pokemon/number "034"]]}
+ {:pokemon/number "035" :evolution/next [[:pokemon/number "036"]]}
+ {:pokemon/number "037" :evolution/next [[:pokemon/number "038"]]}
+ {:pokemon/number "039" :evolution/next [[:pokemon/number "040"]]}
+ {:pokemon/number "041" :evolution/next [[:pokemon/number "042"]]}
+ {:pokemon/number "043" :evolution/next [[:pokemon/number "044"]]}
+ {:pokemon/number "044" :evolution/next [[:pokemon/number "045"]]}
+ {:pokemon/number "046" :evolution/next [[:pokemon/number "047"]]}
+ {:pokemon/number "048" :evolution/next [[:pokemon/number "049"]]}
+ {:pokemon/number "050" :evolution/next [[:pokemon/number "051"]]}
+ {:pokemon/number "052" :evolution/next [[:pokemon/number "053"]]}
+ {:pokemon/number "054" :evolution/next [[:pokemon/number "055"]]}
+ {:pokemon/number "056" :evolution/next [[:pokemon/number "057"]]}
+ {:pokemon/number "058" :evolution/next [[:pokemon/number "059"]]}
+ {:pokemon/number "060" :evolution/next [[:pokemon/number "061"]]}
+ {:pokemon/number "061" :evolution/next [[:pokemon/number "062"]]}
+ {:pokemon/number "063" :evolution/next [[:pokemon/number "064"]]}
+ {:pokemon/number "064" :evolution/next [[:pokemon/number "065"]]}
+ {:pokemon/number "066" :evolution/next [[:pokemon/number "067"]]}
+ {:pokemon/number "067" :evolution/next [[:pokemon/number "068"]]}
+ {:pokemon/number "069" :evolution/next [[:pokemon/number "070"]]}
+ {:pokemon/number "070" :evolution/next [[:pokemon/number "071"]]}
+ {:pokemon/number "072" :evolution/next [[:pokemon/number "073"]]}
+ {:pokemon/number "074" :evolution/next [[:pokemon/number "075"]]}
+ {:pokemon/number "075" :evolution/next [[:pokemon/number "076"]]}
+ {:pokemon/number "077" :evolution/next [[:pokemon/number "078"]]}
+ {:pokemon/number "079" :evolution/next [[:pokemon/number "080"]]}
+ {:pokemon/number "081" :evolution/next [[:pokemon/number "082"]]}
+ {:pokemon/number "084" :evolution/next [[:pokemon/number "085"]]}
+ {:pokemon/number "086" :evolution/next [[:pokemon/number "087"]]}
+ {:pokemon/number "088" :evolution/next [[:pokemon/number "089"]]}
+ {:pokemon/number "090" :evolution/next [[:pokemon/number "091"]]}
+ {:pokemon/number "092" :evolution/next [[:pokemon/number "093"]]}
+ {:pokemon/number "093" :evolution/next [[:pokemon/number "094"]]}
+ {:pokemon/number "096" :evolution/next [[:pokemon/number "097"]]}
+ {:pokemon/number "098" :evolution/next [[:pokemon/number "099"]]}
+ {:pokemon/number "100" :evolution/next [[:pokemon/number "101"]]}
+ {:pokemon/number "102" :evolution/next [[:pokemon/number "103"]]}
+ {:pokemon/number "104" :evolution/next [[:pokemon/number "105"]]}
+ {:pokemon/number "109" :evolution/next [[:pokemon/number "110"]]}
+ {:pokemon/number "111" :evolution/next [[:pokemon/number "112"]]}
+ {:pokemon/number "116" :evolution/next [[:pokemon/number "117"]]}
+ {:pokemon/number "118" :evolution/next [[:pokemon/number "119"]]}
+ {:pokemon/number "120" :evolution/next [[:pokemon/number "121"]]}
+ {:pokemon/number "129" :evolution/next [[:pokemon/number "130"]]}
+ {:pokemon/number "133" :evolution/next [[:pokemon/number "134"] [:pokemon/number "135"] [:pokemon/number "136"]]}
+ {:pokemon/number "138" :evolution/next [[:pokemon/number "139"]]}
+ {:pokemon/number "140" :evolution/next [[:pokemon/number "141"]]}
+ {:pokemon/number "147" :evolution/next [[:pokemon/number "148"]]}
+ {:pokemon/number "148" :evolution/next [[:pokemon/number "149"]]}]
+
+]

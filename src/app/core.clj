@@ -12,9 +12,11 @@
             [app.find-spec]
             [app.ui]
             [app.chapters])
+  (:import (java.io PushbackReader StringReader))
   (:gen-class))
 
 (def max-query-length 2000)
+(def max-forms "The query and up to three inputs." 4)
 (def max-results 1000)
 
 (def allowed-fns #{'- '* '/ '+
@@ -25,37 +27,82 @@
                    'pull
                    'clojure.string/starts-with? 'clojure.string/includes?})
 
-(def query-syntax '#{_ $ ... .})
+(def query-syntax '#{_ $ ... . %})
+
+;; Unqualified names that a query resolves as functions, besides clojure.core's.
+(def datomic-builtins '#{get-else get-some ground tuple untuple q missing?})
 
 (defn- logic-var? [sym]
   (and (nil? (namespace sym)) (str/starts-with? (name sym) "?")))
 
+(defn- vetted-rule-name?
+  "A rule name can't be the name of a function, because a query resolves an
+  unqualified name in function position as clojure.core's or a Datomic built-in.
+  A rule called slurp would otherwise get calls to slurp past the check."
+  [sym]
+  (and (nil? (namespace sym))
+       (boolean (re-matches #"[a-z][a-z0-9-]*[?!]?" (name sym)))
+       (nil? (ns-resolve 'clojure.core sym))
+       (not (datomic-builtins sym))))
+
+(defn- rule-names
+  "The names defined by rules among the query's inputs: the head of every
+  [(name ?x ...) clause ...] inside an input vector."
+  [inputs]
+  (for [input inputs
+        :when (vector? input)
+        rule input
+        :when (and (vector? rule) (seq? (first rule)) (symbol? (ffirst rule)))]
+    (ffirst rule)))
+
+(defn unsafe-symbol
+  "The first symbol in the query or its inputs that isn't allowed, or nil.
+  Every symbol is checked, not only the ones that start a list, so a function
+  named as an argument (for example pull's :xform) is caught too. A symbol is
+  allowed when it is a logic variable, query syntax, an allowed function, or the
+  name of a rule defined in the inputs (and that name passes vetting)."
+  [query & inputs]
+  (let [rules (rule-names inputs)
+        rule-ok? (set (filter vetted-rule-name? rules))]
+    (or (first (remove vetted-rule-name? rules))
+        (->> (cons query inputs)
+             (mapcat #(tree-seq coll? seq %))
+             (filter symbol?)
+             (remove #(or (allowed-fns %) (query-syntax %) (logic-var? %) (rule-ok? %)))
+             first))))
+
 (defn safe-q?
-  "True when every symbol in `query` (already read as EDN) is a logic variable,
-  query syntax or an allowed function. All symbols are checked, not only the
-  ones that start a list, so a function named as an argument (for example
-  pull's :xform) is rejected too."
-  [query]
-  (every? #(or (allowed-fns %) (query-syntax %) (logic-var? %))
-          (filter symbol? (tree-seq coll? seq query))))
+  "True when nothing in the query or its inputs is unsafe, see `unsafe-symbol`."
+  [query & inputs]
+  (nil? (apply unsafe-symbol query inputs)))
 
 (defn- user-error
   "An error whose message is meant for the person writing the query."
   [message]
   (ex-info message {::user-error true}))
 
-(defn- read-query [q]
+(defn- read-forms
+  "The query and its inputs: the EDN forms in `q`, in order."
+  [q]
   (when-not (string? q) (throw (user-error "The query must be text")))
   (when (> (count q) max-query-length)
     (throw (user-error (str "The query is too long (the limit is " max-query-length " characters)"))))
-  (try
-    (edn/read-string q)
-    (catch RuntimeException e
-      (throw (user-error (str "Could not read the query: " (ex-message e)))))))
+  (let [forms (try
+                (let [reader (PushbackReader. (StringReader. q))]
+                  (vec (take (inc max-forms)
+                             (take-while #(not= ::eof %)
+                                         (repeatedly #(edn/read {:eof ::eof} reader))))))
+                (catch RuntimeException e
+                  (throw (user-error (str "Could not read the query: " (ex-message e))))))]
+    (when (empty? forms) (throw (user-error "The query is empty")))
+    (when (> (count forms) max-forms)
+      (throw (user-error (str "Too many inputs (the limit is " (dec max-forms) ")"))))
+    forms))
 
 (defn run-q [dataset q]
-  (let [query (read-query q)]
-    (when-not (safe-q? query) (throw (user-error "Unsafe Query")))
+  (let [[query & inputs] (read-forms q)]
+    (when-let [sym (apply unsafe-symbol query inputs)]
+      (throw (user-error (str "Unsafe Query: " sym " is not allowed"))))
     (let [db (app.db/db-value dataset)
           {:keys [query shape]} (app.find-spec/normalize query)]
       (try
@@ -63,7 +110,7 @@
         (shape (d/q {:query query
                      :timeout 500
                      :limit max-results
-                     :args [db]}))
+                     :args (into [db] inputs)}))
         ;; A query that matches every row against every other row (clauses that
         ;; share no variable) can use more memory than we have. The query's
         ;; data is garbage by now, so the server carries on.
@@ -94,7 +141,9 @@
        :headers {"Content-Type" "application/json"}
        :body (json/write-str
               {out (try
-                     (with-out-str (pprint (run-q dataset query)))
+                     ;; keep {:pokemon/name ..} instead of #:pokemon{:name ..}
+                     (binding [*print-namespace-maps* false]
+                       (with-out-str (pprint (run-q dataset query))))
                      (catch Exception e (error-message e)))})}
       {:status 400
        :headers {"Content-Type" "text/plain"}
