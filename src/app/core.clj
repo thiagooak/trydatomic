@@ -195,23 +195,18 @@
        :headers {"Content-Type" "text/plain"}
        :body "Bad request"})))
 
-(def not-found-content
-  [:div
-   [:h1 "Page not found"]
-   [:p [:a {:href "/"} "Back to the start"]]])
-
 (defn chapter-response [slug]
   (let [chapters (app.chapters/chapters)
         chapter (app.chapters/find-chapter chapters slug)]
     {:status (if chapter 200 404)
      :headers {"Content-Type" "text/html"}
      :body (app.ui/page
-            "Learn Datomic Datalog"
+            (if chapter "Learn Datomic Datalog" "Page not found")
             (app.ui/nav chapters (when chapter slug))
             (if chapter
               (list (:content chapter)
                     (apply app.ui/pager (app.chapters/neighbours chapters slug)))
-              not-found-content))}))
+              (app.ui/not-found)))}))
 
 (defroutes routes
   ;; In a real system, you would serve static files from a CDN

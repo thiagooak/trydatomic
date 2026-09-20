@@ -293,3 +293,13 @@
       :line-height "1.2"
     }} "TRY"]
     tip])
+
+(defn not-found
+  "The page for a path that isn't a chapter. `slug` is whatever was asked for."
+  []
+  [:div
+    [:h1 "404 Not Found"]
+    [:p "Entity not found. It may have evolved into another URL."]
+    [:img {:src "/missingno.png" :width 160 :height 144
+          :alt "A Game Boy battle screen with the message: Wild MISSINGNO. appeared!"}]
+    [:p [:a {:href "/" :class "button"} "Back to the start"]]])

@@ -188,3 +188,17 @@
   (testing "a rule named like a view is just a rule"
     (is (seq (run '[:find ?name :in $ % :where (since ?e) [?e :pokemon/name ?name]]
                   '[[(since ?e) [?e :pokemon/name "Pikachu"]]])))))
+
+(deftest page-not-found
+  (let [{:keys [status body]} (core/chapter-response "no-such-page")]
+    (is (= 404 status))
+    (is (re-find #"<title>Page not found</title>" body))
+    (is (re-find #"<h1>404 Not Found</h1>" body))
+    (is (re-find #"It may have evolved into another URL" body))
+    (is (re-find #"src=\"/missingno.png\"" body))
+    (is (re-find #"alt=\"[^\"]*MISSINGNO" body) "the picture has a description")
+    (is (re-find #"<a class=\"button\" href=\"/\">Back to the start</a>" body))
+    (is (re-find #"nav aria-label=\"Chapters\"" body) "the chapter list is still there"))
+  (testing "the page does not echo what was asked for"
+    (is (not (re-find #"alert\(1\)" (:body (core/chapter-response "<script>alert(1)</script>")))))
+    (is (not (re-find #"a{60}" (:body (core/chapter-response (apply str (repeat 200 "a")))))))))
