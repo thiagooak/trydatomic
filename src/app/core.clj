@@ -8,6 +8,7 @@
             [clojure.edn :as edn]
             [datomic.client.api :as d]
             [app.db]
+            [app.find-spec]
             [app.ui]
             [app.chapters])
   (:gen-class))
@@ -37,10 +38,11 @@
 
 (defn run-q [dataset q]
   (when-not (safe-q? q) (throw (Exception. "Unsafe Query")))
-  (let [db (app.db/db-value dataset)]
-    (d/q {:query q
-          :timeout 500
-          :args [db]})))
+  (let [db (app.db/db-value dataset)
+        {:keys [query shape]} (app.find-spec/normalize (edn/read-string q))]
+    (shape (d/q {:query query
+                 :timeout 500
+                 :args [db]}))))
 
 (def not-found-content
   [:div
