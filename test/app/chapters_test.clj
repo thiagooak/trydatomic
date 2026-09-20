@@ -95,6 +95,6 @@
           [dataset forms] (runnables (:slug chapter))
           :let [text (apply ui/editor-text forms)]]
     (testing (str (:slug chapter) " " text)
-      (is (apply core/safe-q? forms))
-      ;; what the Run button posts: the text in the editor
+      ;; what the Run button posts: the text in the editor. run-q refuses anything
+      ;; unsafe, so running it is the safety check too.
       (is (some? (core/run-q dataset text))))))

@@ -1,0 +1,131 @@
+{:nav-title "Time travel"
+ :content
+ [:div
+  [:h1 "Time Travel"]
+  [:p "Datomic never overwrites anything. When a fact changes, it adds the new fact and records that the old one "
+   "was " [:em "retracted"] ". Every fact is stamped with the transaction that added or retracted it, "
+   "and a transaction is an entity like any other."]
+  [:p "Because nothing is lost, the database is a " [:em "value"] " that you can ask about any earlier point. "
+   "That is what makes Datomic's time travel possible, and it takes only a few lines of Datalog."]
+  [:p "The games changed these 151 Pokemon over the years, "
+   "so our database was loaded the way it grew: one transaction for each game generation, "
+   "holding what that generation changed. Generations III to V didn't change any of them. "
+   "Their transactions only record that the generation happened."]
+
+  [:h2 "Transactions are entities"]
+  [:p "Each of our transactions says which generation it records, in " [:code ":tx/generation"] ", "
+   "and when those games were first released, in " [:code ":tx/released"] ". "
+   "Datomic also stamps every transaction with " [:code ":db/txInstant"] ", the moment it recorded it. "
+   "That is when this server loaded the data, not 1996. So we kept the real-world date ourselves, "
+   "as an attribute of the transaction:"]
+  [:ui/runnable "pokemon"
+   [:find ?generation ?released ?recorded
+    :where
+    [?tx :tx/generation ?generation]
+    [?tx :tx/released ?released]
+    [?tx :db/txInstant ?recorded]]]
+
+  [:h2 "as-of"]
+  [:p [:code "as-of"] " is the database as it was after a transaction. "
+   "In the editors on this page, the inputs after the query can be views of the database, "
+   "like " [:code "(as-of \"Generation V\")"] ". "
+   "Clefairy's type has changed, so let's look at it as it was in Generation V. "
+   "The query declares the view with " [:code ":in $ $then"] ": " [:code "$"] " is the database as it is now, "
+   [:code "$then"] " is the view, and each clause says which one it reads from by starting with it:"]
+  [:ui/runnable "pokemon"
+   [:find ?type
+    :in $ $then
+    :where
+    [$then ?e :pokemon/name "Clefairy"]
+    [$then ?e :pokemon/type ?type]]
+   (as-of "Generation V")]
+  [:p "And today, straight from the current database:"]
+  [:ui/runnable "pokemon"
+   [:find ?type
+    :where
+    [?e :pokemon/name "Clefairy"]
+    [?e :pokemon/type ?type]]]
+
+  [:h2 "Two databases in one query"]
+  [:p "A query can read both. Which Pokemon have more attack today than they had in Generation V? "
+   "Notice that the same " [:code "?e"] " is used with both, since an entity keeps its id through time:"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?before ?now
+    :in $ $then
+    :where
+    [$ ?e :pokemon/name ?name]
+    [$then ?e :stat/attack ?before]
+    [$ ?e :stat/attack ?now]
+    [(not= ?before ?now)]]
+   (as-of "Generation V")]
+  [:p [:code "not"] " works across databases too. Which Pokemon have a type they didn't have in Generation V?"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?type
+    :in $ $then
+    :where
+    [$ ?e :pokemon/name ?name]
+    [$ ?e :pokemon/type ?type]
+    (not [$then ?e :pokemon/type ?type])]
+   (as-of "Generation V")]
+
+  [:h2 "history"]
+  [:p [:code "(history)"] " is a view with everything that ever happened, including the facts that were retracted. "
+   "Its patterns have two more positions: the transaction, and whether the fact was added (" [:code "true"]
+   ") or retracted (" [:code "false"] "). "
+   "Here is every change to Clefairy's type, with the generation of the transaction that made it:"]
+  [:ui/runnable "pokemon"
+   [:find ?type ?added ?generation
+    :in $ $history
+    :where
+    [$ ?e :pokemon/name "Clefairy"]
+    [$history ?e :pokemon/type ?type ?tx ?added]
+    [$history ?tx :tx/generation ?generation]]
+   (history)]
+  [:p "Normal was added in Generation I. In Generation VI it was retracted and Fairy was added. "
+   "A history query has to name an attribute, because asking for every fact ever "
+   "would scan the whole database, and Datomic refuses to."]
+
+  [:h2 "since"]
+  [:p [:code "since"] " is the opposite of " [:code "as-of"] ": "
+   "a view with only the facts added " [:em "after"] " a transaction. "
+   "Which attack values changed after Generation VI? "
+   "The Pokemon's name didn't change, so we read it from the current database:"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?attack
+    :in $ $since
+    :where
+    [$since ?e :stat/attack ?attack]
+    [$ ?e :pokemon/name ?name]]
+   (since "Generation VI")]
+
+  [:h2 "A retired attribute"]
+  [:p "In Generation I there was a single " [:strong "Special"] " stat, stored in " [:code ":stat/special"] ". "
+   "Generation II split it into " [:code ":stat/sp-attack"] " and " [:code ":stat/sp-defense"] ". "
+   "The old attribute is still in the schema, but no Pokemon has it any more. "
+   "Both eras of Bulbasaur fit in one row:"]
+  [:ui/runnable "pokemon"
+   [:find ?special ?sp-attack ?sp-defense
+    :in $ $then
+    :where
+    [$then ?e :pokemon/name "Bulbasaur"]
+    [$then ?e :stat/special ?special]
+    [$ ?e :stat/sp-attack ?sp-attack]
+    [$ ?e :stat/sp-defense ?sp-defense]]
+   (as-of "Generation I")]
+
+  [:h2 "Types come and go"]
+  [:p "The first games had 15 types. Steel and Dark arrived in Generation II, and Fairy in Generation VI. "
+   "We recorded when each type appeared, not every later change to how types fare against each other, "
+   "so the type chart you see for a past generation is today's, restricted to the types that existed then. "
+   "How many types were there in Generation I?"]
+  [:ui/runnable "pokemon"
+   [:find (count ?type)
+    :in $ $then
+    :where
+    [$then ?type :type/name _]]
+   (as-of "Generation I")]
+  [:ui/try-tip
+   [:p "Change the generation in the last query to " [:code "\"Generation II\""] " and then "
+    [:code "\"Generation VI\""] " to watch Steel, Dark and Fairy arrive. "
+    "Or change " [:code ":stat/attack"] " to " [:code ":stat/defense"] " in the two-database query "
+    "to see who got more defense."]]]}

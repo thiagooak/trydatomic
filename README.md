@@ -55,7 +55,7 @@ Chapters are EDN files in `resources/chapters/`.
 
 | Tag | Renders |
 | --- | --- |
-| `[:ui/runnable dataset query & inputs]` | An editable query with Run and Reset buttons. Any inputs after the query are passed to its `:in` clause in order, after `$`. A vector of rules is the input for `%`. |
+| `[:ui/runnable dataset query & inputs]` | An editable query with Run and Reset buttons. Any inputs after the query are passed to its `:in` clause in order, after `$`. A vector of rules is the input for `%`. `(as-of "Generation V")`, `(since "Generation V")` and `(history)` are views of the database, see the Time travel chapter. |
 | `[:ui/code query]` | A read-only code block from data, pretty-printed. |
 | `[:ui/code lang string]` | A read-only code block from a string, shown as written. |
 | `[:ui/try-tip hiccup]` | A highlighted "TRY" box. |

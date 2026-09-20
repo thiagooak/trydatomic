@@ -100,6 +100,66 @@
     [(evolves-into? ?a ?c)
      [?a :evolution/next ?b]
      (evolves-into? ?b ?c)]]]
+
+  [:h2 "Rules over relationships"]
+  [:p "In the " [:a {:href "/relationships"} "Relationships"] " chapter we found the Pokemon that hit Gengar "
+   "super-effectively with a join across three kinds of links. "
+   "A rule can put a name on that whole join, taking an attacker and a defender. "
+   "Then the query reads like a sentence:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :in $ %
+    :where
+    [?gengar :pokemon/name "Gengar"]
+    (super-effective? ?e ?gengar)
+    [?e :pokemon/name ?name]]
+   [[(super-effective? ?attacker ?defender)
+     [?attacker :pokemon/type ?attacking-name]
+     [?defender :pokemon/type ?defending-name]
+     [?attacking :type/name ?attacking-name]
+     [?defending :type/name ?defending-name]
+     [?attacking :type/strong-against ?defending]]]]
+  [:p "A rule is an ordinary clause, so it combines with the others, including negation. "
+   "Gengar is Ghost and Poison. Which of the Pokemon that beat it are not Poison type?"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :in $ %
+    :where
+    [?gengar :pokemon/name "Gengar"]
+    (super-effective? ?e ?gengar)
+    (not [?e :pokemon/type "Poison"])
+    [?e :pokemon/name ?name]]
+   [[(super-effective? ?attacker ?defender)
+     [?attacker :pokemon/type ?attacking-name]
+     [?defender :pokemon/type ?defending-name]
+     [?attacking :type/name ?attacking-name]
+     [?defending :type/name ?defending-name]
+     [?attacking :type/strong-against ?defending]]]]
+
+  [:h2 "Rules with function clauses"]
+  [:p "The body of a rule can hold any clause, including the "
+   [:a {:href "/function-clauses"} "function clauses"] " we saw earlier. "
+   "This rule computes a Pokemon's base stat total, and exposes it as its second parameter. "
+   "Then we can use it twice in one query, to compare Charizard with everyone else:"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?total
+    :in $ %
+    :where
+    [?charizard :pokemon/name "Charizard"]
+    (base-total ?charizard ?charizard-total)
+    (base-total ?e ?total)
+    [(> ?total ?charizard-total)]
+    [?e :pokemon/name ?name]]
+   [[(base-total ?e ?total)
+     [?e :stat/hp ?hp]
+     [?e :stat/attack ?attack]
+     [?e :stat/defense ?defense]
+     [?e :stat/sp-attack ?sp-attack]
+     [?e :stat/sp-defense ?sp-defense]
+     [?e :stat/speed ?speed]
+     [(+ ?hp ?attack ?defense ?sp-attack ?sp-defense ?speed) ?total]]]]
+  [:p "Charizard's total is 534. These are the Pokemon with a higher one."]
+
   [:ui/try-tip
    [:p "Change " [:code "\"Bulbasaur\""] " to " [:code "\"Eevee\""] " in the recursive query to see it branch. "
     "Or edit the " [:code "strong?"] " rule to require both attack > 90 "

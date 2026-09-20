@@ -19,7 +19,7 @@
 
 (deftest safe-q-checks-every-symbol
   (testing "functions named as arguments are rejected, not just called ones"
-    (is (not (safe-q? (edn/read-string "[:find (pull ?e [(:pokemon/name :xform clojure.string/upper-case)]) :where [?e :pokemon/name _]]"))))
+    (is (not (safe-q? (edn/read-string "[:find (pull ?e [(:pokemon/name :xform clojure.string/reverse)]) :where [?e :pokemon/name _]]"))))
     (is (not (safe-q? (edn/read-string "[:find ?x :where [(identity System/exit) ?x]]"))))
     (is (not (safe-q? '[:find ?x :where [(read-string ?y) ?x]]))))
   (testing "logic variables, wildcards and query syntax are fine"
@@ -136,3 +136,55 @@
 (deftest results-do-not-use-namespace-map-shorthand
   (is (not (re-find #"#:" (ask "[:find (pull ?e [:pokemon/name]) :where [?e :pokemon/name \"Pikachu\"]]"))))
   (is (re-find #":pokemon/name \"Pikachu\"" (ask "[:find (pull ?e [:pokemon/name]) :where [?e :pokemon/name \"Pikachu\"]]"))))
+
+(deftest function-clauses
+  (testing "the allowed functions are accepted"
+    (doseq [q '[[:find ?x :where [?e :pokemon/name ?n] [(str "#" ?n) ?x]]
+                [:find ?x :where [?e :pokemon/name ?n] [(subs ?n 0 1) ?x]]
+                [:find ?x :where [?e :pokemon/name ?n] [(clojure.string/upper-case ?n) ?x]]
+                [:find ?x :where [?e :pokemon/name ?n] [(clojure.string/lower-case ?n) ?x]]
+                [:find ?x :where [?e :pokemon/name _] [(get-else $ ?e :pokemon/category :regular) ?x]]]]
+      (is (safe-q? q) (pr-str q))))
+  (testing "other functions are still rejected"
+    (doseq [f '[slurp re-find re-pattern println eval clojure.string/replace clojure.java.shell/sh]]
+      (is (not (safe-q? [:find '?x :where [(list f "a") '?x]])) (str f))))
+  (testing "results"
+    (is (= #{["#Pikachu"]} (set (run '[:find ?x :where [?e :pokemon/name "Pikachu"] [(str "#" "Pikachu") ?x]]))))
+    (is (= #{["Pik"]} (set (run '[:find ?x :where [?e :pokemon/name "Pikachu"] [(subs "Pikachu" 0 3) ?x]]))))
+    (is (= #{["PIKACHU"]} (set (run '[:find ?x :where [?e :pokemon/name "Pikachu"] [(clojure.string/upper-case "Pikachu") ?x]]))))
+    (is (= #{[:legendary 4] [:regular 147]}
+           (set (run '[:find ?c (count ?e) :where [?e :pokemon/name _] [(get-else $ ?e :pokemon/category :regular) ?c]]))))
+    (is (= #{["Mewtwo" 680] ["Dragonite" 600] ["Mew" 600]}
+           (set (run '[:find ?name ?total :where
+                       [?e :pokemon/name ?name] [?e :stat/hp ?a] [?e :stat/attack ?b] [?e :stat/defense ?c]
+                       [?e :stat/sp-attack ?d] [?e :stat/sp-defense ?f] [?e :stat/speed ?g]
+                       [(+ ?a ?b ?c ?d ?f ?g) ?total] [(>= ?total 600)]]))))))
+
+(deftest database-views
+  (testing "an unknown generation lists the known ones"
+    (is (thrown-with-msg? Exception #"no generation called \"Generation IX\". Try one of: Generation I, Generation II"
+                          (run '[:find ?e :in $ $then :where [$then ?e :pokemon/name _]] '(as-of "Generation IX")))))
+  (testing "views take exactly what they say"
+    (doseq [view ['(as-of 5) '(as-of "a" "b") '(as-of) '(as-of (slurp "x")) '(since "Generation I" 2) '(history 1) '(since :x)]]
+      (is (thrown-with-msg? Exception #"takes|no arguments" (run '[:find ?e :in $ $then :where [$then ?e :pokemon/name _]] view))
+          (pr-str view))))
+  (testing "other input forms are still checked as data"
+    (is (thrown-with-msg? Exception #"Unsafe Query: slurp is not allowed"
+                          (run '[:find ?e :in $ $then :where [$then ?e :pokemon/name _]] '(slurp "x"))))
+    (is (thrown-with-msg? Exception #"Unsafe Query: foo is not allowed"
+                          (run '[:find ?e :in $ $then :where [$then ?e :pokemon/name _]] '(foo "Generation V")))))
+  (testing "as-of, since and history are not functions a query can call"
+    (is (thrown-with-msg? Exception #"as-of is not allowed"
+                          (run '[:find ?x :where [(as-of "Generation V") ?x]])))
+    (is (thrown-with-msg? Exception #"history is not allowed"
+                          (run '[:find ?x :where [(history) ?x]]))))
+  (testing "data sources are ordinary symbols, but not functions"
+    (is (safe-q? '[:find ?e :in $ $then :where [$then ?e :pokemon/name _]]))
+    (is (thrown? Exception (run '[:find ?x :where [($then 1) ?x]])) "there is no function called $then")
+    (is (not (safe-q? '[:find ?e :in $ $Then :where [$Then ?e :pokemon/name _]]))))
+  (testing "a history query has to bind an attribute, and Datomic says so"
+    (is (thrown-with-msg? Exception #"full scan"
+                          (run '[:find ?e :in $ $h :where [$h ?e ?a ?v ?tx ?added]] '(history)))))
+  (testing "a rule named like a view is just a rule"
+    (is (seq (run '[:find ?name :in $ % :where (since ?e) [?e :pokemon/name ?name]]
+                  '[[(since ?e) [?e :pokemon/name "Pikachu"]]])))))

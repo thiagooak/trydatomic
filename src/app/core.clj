@@ -25,7 +25,9 @@
                    'or 'or-join 'and
                    'sum 'avg 'min 'max 'count-distinct 'distinct
                    'pull
-                   'clojure.string/starts-with? 'clojure.string/includes?})
+                   'get-else 'str 'subs
+                   'clojure.string/starts-with? 'clojure.string/includes?
+                   'clojure.string/upper-case 'clojure.string/lower-case})
 
 (def query-syntax '#{_ $ ... . %})
 
@@ -34,6 +36,11 @@
 
 (defn- logic-var? [sym]
   (and (nil? (namespace sym)) (str/starts-with? (name sym) "?")))
+
+(defn- source-var?
+  "$, or a named data source like $then, which a query can declare in :in."
+  [sym]
+  (and (nil? (namespace sym)) (boolean (re-matches #"\$[a-z][a-z0-9-]*" (name sym)))))
 
 (defn- vetted-rule-name?
   "A rule name can't be the name of a function, because a query resolves an
@@ -59,8 +66,9 @@
   "The first symbol in the query or its inputs that isn't allowed, or nil.
   Every symbol is checked, not only the ones that start a list, so a function
   named as an argument (for example pull's :xform) is caught too. A symbol is
-  allowed when it is a logic variable, query syntax, an allowed function, or the
-  name of a rule defined in the inputs (and that name passes vetting)."
+  allowed when it is a logic variable, a data source, query syntax, an allowed
+  function, or the name of a rule defined in the inputs (and that name passes
+  vetting)."
   [query & inputs]
   (let [rules (rule-names inputs)
         rule-ok? (set (filter vetted-rule-name? rules))]
@@ -68,7 +76,7 @@
         (->> (cons query inputs)
              (mapcat #(tree-seq coll? seq %))
              (filter symbol?)
-             (remove #(or (allowed-fns %) (query-syntax %) (logic-var? %) (rule-ok? %)))
+             (remove #(or (allowed-fns %) (query-syntax %) (logic-var? %) (source-var? %) (rule-ok? %)))
              first))))
 
 (defn safe-q?
@@ -99,9 +107,47 @@
       (throw (user-error (str "Too many inputs (the limit is " (dec max-forms) ")"))))
     forms))
 
+;; An input like (as-of "Generation V") stands for a view of the database, in the
+;; same place a real call would pass (d/as-of db t). It's turned into a record
+;; before the safety check, so as-of, since and history never become functions
+;; a query may call.
+(defrecord DbView [view generation])
+
+(defn- db-view
+  "A DbView for (as-of \"generation\"), (since \"generation\") or (history), nil
+  for any other input."
+  [form]
+  (when (and (seq? form) ('#{as-of since history} (first form)))
+    (let [[head & args] form]
+      (if (if (= head 'history)
+            (empty? args)
+            (and (= 1 (count args)) (string? (first args))))
+        (->DbView (keyword head) (first args))
+        (throw (user-error (if (= head 'history)
+                             "history takes no arguments: (history)"
+                             (str head " takes the name of a generation: (" head " \"Generation V\")"))))))))
+
+(defn- generation-tx [db generation]
+  (or (ffirst (d/q '[:find ?tx :in $ ?g :where [?tx :tx/generation ?g]] db generation))
+      (let [known (->> (d/q '[:find ?g ?released :where [?tx :tx/generation ?g] [?tx :tx/released ?released]] db)
+                       (sort-by second)
+                       (map first))]
+        (throw (user-error (str "There is no generation called " (pr-str generation)
+                                (when (seq known) (str ". Try one of: " (str/join ", " known)))))))))
+
+(defn- resolve-input [db input]
+  (if (instance? DbView input)
+    (let [{:keys [view generation]} input]
+      (case view
+        :as-of (d/as-of db (generation-tx db generation))
+        :since (d/since db (generation-tx db generation))
+        :history (d/history db)))
+    input))
+
 (defn run-q [dataset q]
-  (let [[query & inputs] (read-forms q)]
-    (when-let [sym (apply unsafe-symbol query inputs)]
+  (let [[query & inputs] (read-forms q)
+        inputs (mapv #(or (db-view %) %) inputs)]
+    (when-let [sym (apply unsafe-symbol query (remove #(instance? DbView %) inputs))]
       (throw (user-error (str "Unsafe Query: " sym " is not allowed"))))
     (let [db (app.db/db-value dataset)
           {:keys [query shape]} (app.find-spec/normalize query)]
@@ -110,7 +156,7 @@
         (shape (d/q {:query query
                      :timeout 500
                      :limit max-results
-                     :args (into [db] inputs)}))
+                     :args (into [db] (map #(resolve-input db %) inputs))}))
         ;; A query that matches every row against every other row (clauses that
         ;; share no variable) can use more memory than we have. The query's
         ;; data is garbage by now, so the server carries on.

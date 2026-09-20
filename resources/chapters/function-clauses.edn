@@ -1,0 +1,77 @@
+{:nav-title "Function clauses"
+ :content
+ [:div
+  [:h1 "Function Clauses"]
+  [:p "A predicate like " [:code "[(> ?speed 100)]"] " only filters. "
+   "A " [:strong "function clause"] " goes one step further: it calls a function and binds the "
+   "result to a new variable, " [:code "[(function arg ...) ?result]"] ". "
+   "The new variable can be used by later clauses, returned in " [:code ":find"]
+   ", or grouped and counted, like any other."]
+
+  [:h2 "Arithmetic"]
+  [:p "A Pokemon's base stat total is the sum of its six base stats. "
+   [:code "+"] " accepts as many arguments as we give it. "
+   "Here is every Pokemon with a total of 600 or more. "
+   "The first function clause binds " [:code "?total"] ", and the predicate after it filters on it:"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?total
+    :where
+    [?e :pokemon/name ?name]
+    [?e :stat/hp ?hp]
+    [?e :stat/attack ?attack]
+    [?e :stat/defense ?defense]
+    [?e :stat/sp-attack ?sp-attack]
+    [?e :stat/sp-defense ?sp-defense]
+    [?e :stat/speed ?speed]
+    [(+ ?hp ?attack ?defense ?sp-attack ?sp-defense ?speed) ?total]
+    [(>= ?total 600)]]]
+
+  [:h2 "Watch out for integer division"]
+  [:p "Dividing one integer by another gives an integer, rounded down. "
+   "Multiply one side by " [:code "1.0"] " first to get a decimal. "
+   "Mewtwo's attack is 110 and its defense is 90:"]
+  [:ui/runnable "pokemon"
+   [:find ?whole ?ratio
+    :where
+    [?e :pokemon/name "Mewtwo"]
+    [?e :stat/attack ?attack]
+    [?e :stat/defense ?defense]
+    [(/ ?attack ?defense) ?whole]
+    [(* 1.0 ?attack) ?decimal]
+    [(/ ?decimal ?defense) ?ratio]]]
+
+  [:h2 "Strings"]
+  [:p [:code "str"] " joins values into a string. Here it builds a label from a Pokemon's number and name:"]
+  [:ui/runnable "pokemon"
+   [:find ?label
+    :where
+    [?e :pokemon/type "Ghost"]
+    [?e :pokemon/number ?number]
+    [?e :pokemon/name ?name]
+    [(str "#" ?number " " ?name) ?label]]]
+  [:p [:code "subs"] " takes part of a string, from a start index up to (but not including) an end index. "
+   "Bound values can be grouped like any variable, so we can count how many Pokemon start with each letter. "
+   "Datalog groups by everything in " [:code ":find"] " that isn't an aggregate:"]
+  [:ui/runnable "pokemon"
+   [:find ?initial (count ?e)
+    :where
+    [?e :pokemon/name ?name]
+    [(subs ?name 0 1) ?initial]]]
+  [:p [:code "clojure.string/upper-case"] " and " [:code "clojure.string/lower-case"] " are available too."]
+
+  [:h2 "Defaults with get-else"]
+  [:p "Only a few Pokemon have a " [:code ":pokemon/category"] ". "
+   "A clause that uses the attribute leaves out every Pokemon without it. "
+   [:code "get-else"] " keeps them, and supplies a default value instead. "
+   "It takes the database, an entity, an attribute and the default:"]
+  [:ui/runnable "pokemon"
+   [:find ?category (count ?e)
+    :where
+    [?e :pokemon/name _]
+    [(get-else $ ?e :pokemon/category :regular) ?category]]]
+  [:p "Compare it with " [:code "missing?"] " from the " [:a {:href "/negation"} "Negation"]
+   " chapter, which keeps only the Pokemon that lack the attribute."]
+
+  [:ui/try-tip
+   [:p "Lower the total in the first query to " [:code "580"] " to see the legendary birds join the list. "
+    "Or wrap the label in " [:code "clojure.string/upper-case"] " with another function clause."]]]}

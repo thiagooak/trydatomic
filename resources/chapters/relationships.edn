@@ -1,0 +1,80 @@
+{:nav-title "Relationships"
+ :content
+ [:div
+  [:h1 "Relationships"]
+  [:p "So far every query has looked at one kind of thing, a Pokemon, and its attributes. "
+   "Datomic can also connect entities to each other. "
+   "Our database has a second kind of entity, the " [:strong "types"] " like Fire and Water, "
+   "along with which types are strong against which. Water is strong against Fire, for example."]
+  [:p "Each type points at the types it is strong against. That takes an attribute whose value "
+   "is another entity, a " [:strong "reference"] ", declared with " [:code ":db.type/ref"] ":"]
+  [:ui/code "clojure"
+   "(d/transact conn {:tx-data [{:db/ident :type/name
+                             :db/valueType :db.type/string
+                             :db/cardinality :db.cardinality/one
+                             :db/unique :db.unique/identity}
+
+                            {:db/ident :type/strong-against
+                             :db/valueType :db.type/ref
+                             :db/cardinality :db.cardinality/many}]})"]
+  [:p "A type is strong against several others, so the cardinality is many. "
+   "The database also has " [:code ":type/weak-against"] " (half damage) and "
+   [:code ":type/no-effect-on"] " (no damage)."]
+
+  [:h2 "Following a reference"]
+  [:p "The value of a reference attribute is an entity id. "
+   "That means a variable can be an entity in one clause and a value in the next. "
+   "Read the second clause below as \"" [:code "?attacker"] " is strong against " [:code "?fire"] "\":"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?fire :type/name "Fire"]
+    [?attacker :type/strong-against ?fire]
+    [?attacker :type/name ?name]]]
+
+  [:h2 "Both directions"]
+  [:p "The same attribute answers the opposite question. "
+   "Which position the known entity takes decides the direction. "
+   "Here Fire is on the left, so we get the types Fire is strong against:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?fire :type/name "Fire"]
+    [?fire :type/strong-against ?defender]
+    [?defender :type/name ?name]]]
+
+  [:h2 "Joining by value"]
+  [:p "A Pokemon's types are plain strings, like " [:code "\"Ghost\""] ", and a type entity has the same string in "
+   [:code ":type/name"] ". We didn't need a reference between them. "
+   "Datalog joins on any equal values: when two clauses use the same variable, "
+   "they have to agree on it, whether it is an entity id or a string."]
+  [:p "That lets a query hop across three kinds of links. "
+   "Which Pokemon hit Gengar super-effectively? "
+   "Gengar's type strings lead to their type entities (by value), "
+   "the types strong against those (by reference), "
+   "and back to the Pokemon that have such a type (by value):"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?gengar :pokemon/name "Gengar"]
+    [?gengar :pokemon/type ?defending-name]
+    [?defending :type/name ?defending-name]
+    [?attacking :type/strong-against ?defending]
+    [?attacking :type/name ?attacking-name]
+    [?e :pokemon/type ?attacking-name]
+    [?e :pokemon/name ?name]]]
+
+  [:h2 "Negation across relationships"]
+  [:p [:code "not-join"] " works across relationships too. "
+   "Which types have no Pokemon at all? "
+   "Only " [:code "?name"] " is shared between the " [:code "not-join"] " and the rest of the query:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?type :type/name ?name]
+    (not-join [?name]
+              [?pokemon :pokemon/type ?name])]]
+  [:ui/try-tip
+   [:p "Change " [:code "\"Gengar\""] " to another Pokemon, like " [:code "\"Charizard\""] ", in the join. "
+    "Or in the first query, change " [:code "\"Fire\""] " to " [:code "\"Ghost\""] " and "
+    [:code ":type/strong-against"] " to " [:code ":type/no-effect-on"] " to see which types can't touch Ghost."]]]}

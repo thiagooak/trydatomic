@@ -89,6 +89,15 @@
     [?e :pokemon/name "Charmander"]]]
   [:p "The value of " [:code ":evolution/next"] " is now a collection of maps, one for each Pokemon "
    "Charmander evolves into, and each map follows the pattern we gave it."]
+  [:p "A pattern can follow several references at once, each with its own pattern. "
+   "Here is everything the database knows about Fire's matchups:"]
+  [:ui/runnable "pokemon"
+   [:find (pull ?t [:type/name
+                    {:type/strong-against [:type/name]}
+                    {:type/weak-against [:type/name]}
+                    {:type/no-effect-on [:type/name]}])
+    :where
+    [?t :type/name "Fire"]]]
 
   [:h2 "Reverse lookups"]
   [:p "Put an underscore in front of the attribute name to follow a reference backwards. "
