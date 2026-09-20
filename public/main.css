@@ -159,9 +159,36 @@ main table td, main table th {
 }
 
 footer {
-    padding-bottom: 1em;
-    font-size: small;
-    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6em;
+    margin-top: 2em;
+    padding-bottom: 1.5em;
+    text-align: center;
+}
+
+.source {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.source svg {
+    width: 1.2em;
+    height: 1.2em;
+    fill: currentColor;
+}
+
+.disclaimer {
+    margin: 0;
+    font-size: 0.7rem;
+    color: var(--muted);
 }
 
 code-highlighter {
