@@ -124,6 +124,17 @@ code-highlighter {
     align-items: center;
     gap: 8px;
     border-radius: 999px;
+    text-decoration: none;
+}
+
+.pager {
+    display: flex;
+    justify-content: space-between;
+    margin: 2em 0;
+}
+
+.pager .next {
+    margin-left: auto;
 }
 
 .button.run {

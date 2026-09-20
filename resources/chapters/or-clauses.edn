@@ -47,7 +47,7 @@
   [:p "The " [:code "[?e]"] " in " [:code "or-join"] " declares that " [:code "?e"] " is the only variable "
    "that must unify with the outer query. "
    [:code "?speed"] " is a local variable that lives only inside its branch."]
-  [:p [:strong "Try:"] " Add a third " [:code "or"] " branch for \"Electric\" in the first query. "
-   "Or modify the " [:code "or-join"] " query to find Pokemon that are Ground-type "
-   [:em "or"] " have attack above 120."]
-  [:p [:a {:href "/negation"} "Previous"] " | " [:a {:href "/cardinality-many"} "Next"]]]}
+  [:ui/try-tip
+   [:p "Add a third " [:code "or"] " branch for \"Electric\" in the first query. "
+    "Or modify the " [:code "or-join"] " query to find Pokemon that are Ground-type "
+    [:em "or"] " have attack above 120."]]]}

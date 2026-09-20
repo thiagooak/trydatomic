@@ -170,5 +170,4 @@
   [:h2 "Resources"]
   [:ul [:li [:a {:href "https://en.wikipedia.org/wiki/Entity%E2%80%93attribute%E2%80%93value_model"}
              "Entity-attribute-value model"]]
-   [:li [:a {:href "https://docs.datomic.com/whatis/data-model.html#universal"} "Datomic Docs: Data Model"]]]
-  [:p [:a {:href "/"} "Previous"] " | " [:a {:href "/querying"} "Next"]]]}
+   [:li [:a {:href "https://docs.datomic.com/whatis/data-model.html#universal"} "Datomic Docs: Data Model"]]]]}

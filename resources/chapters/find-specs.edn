@@ -75,6 +75,6 @@
   [:p "Pikachu has exactly one entry in the database so this is safe. "
    "The result is a plain vector " [:code "[\"025\" \"Electric\" 90]"] " "
    "rather than a collection of tuples — easy to destructure directly in Clojure."]
-  [:p [:strong "Try:"] " Use the tuple find spec to look up a different Pokemon — try \"Mewtwo\" or \"Snorlax\". "
-   "Or combine the scalar spec with " [:code "(min ?speed)"] " to return just the single lowest speed value in the Pokedex."]
-  [:p [:a {:href "/aggregations"} "Previous"]]]}
+  [:ui/try-tip
+   [:p "Use the tuple find spec to look up a different Pokemon — try \"Mewtwo\" or \"Snorlax\". "
+    "Or combine the scalar spec with " [:code "(min ?speed)"] " to return just the single lowest speed value in the Pokedex."]]]}

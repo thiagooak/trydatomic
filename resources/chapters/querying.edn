@@ -49,5 +49,4 @@
    [:a {:href "https://github.com/thiagooak/learn-datalog/blob/main/resources/pokemon.edn"} "EDN file"]
    " defining all of the Pokemon in our database."]
   [:p "Run the last query with a dual-typed Pokemon like \"Charizard\" and observe "
-   "how many attribute-value rows appear — one for each fact stored about that entity."]
-  [:p [:a {:href "/" :class "button"} "← Previous Chapter"] " | " [:a {:href "/predicates"} "Next"]]]}
+   "how many attribute-value rows appear — one for each fact stored about that entity."]]}

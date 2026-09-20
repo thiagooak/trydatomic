@@ -38,7 +38,7 @@
     :where
     [?e :pokemon/name ?name]
     [(clojure.string/includes? ?name "saur")]]]
-  [:p [:strong "Try:"] " Combine two predicates to find Pokemon whose name starts with \"S\" "
-   [:em "and"] " whose speed is above 100. "
-   "Or find Pokemon whose attack " [:em "and"] " defense are both above 80."]
-  [:p [:a {:href "/querying"} "Previous"] " | " [:a {:href "/negation"} "Next"]]]}
+  [:ui/try-tip
+   [:p "Combine two predicates to find Pokemon whose name starts with \"S\" "
+    [:em "and"] " whose speed is above 100. "
+    "Or find Pokemon whose attack " [:em "and"] " defense are both above 80."]]]}

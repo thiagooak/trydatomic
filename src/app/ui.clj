@@ -9,8 +9,20 @@
     (slurp resource)
     "dev"))
 
-(defn nav-li [{:keys [slug nav-title]}]
-  [:li [:a {:href (if (= slug "index") "/" (str "/" slug))} nav-title]])
+(defn chapter-href [{:keys [slug]}]
+  (if (= slug "index") "/" (str "/" slug)))
+
+(defn nav-li [{:keys [nav-title] :as chapter}]
+  [:li [:a {:href (chapter-href chapter) :style {:color "var(--ink)"}} nav-title]])
+
+(defn pager
+  "Previous and next chapter buttons. Either chapter may be nil."
+  [previous following]
+  [:div {:class "pager"}
+   (when previous
+     [:a {:href (chapter-href previous) :rel "prev" :class "button"} "← Previous"])
+   (when following
+     [:a {:href (chapter-href following) :rel "next" :class "button next"} "Next →"])])
 
 (defn nav [chapters]
   [:nav [:ul
@@ -35,7 +47,7 @@
       [:link {:rel :stylesheet :href (str "/main.css?v=" version)}]]
      [:body
        [:header
-         [:a {:href "/" :style {:display "flex" :align-items "center" :justify-content "center" :margin-top "1em" :text-decoration "none"}}[:img {:src "/eav.svg" :class "logo" :width 50 :height 50 :style {:margin-right "10px"}}]
+         [:a {:href "/" :style {:display "flex" :align-items "center" :justify-content "center" :margin-top "1em" :text-decoration "none" :color "var(--ink)"}}[:img {:src "/eav.svg" :class "logo" :width 50 :height 50 :style {:margin-right "10px"}}]
           [:p {:style {:font-size "2em" :margin 0}} [:span {:style {:font-weight "bold"}} "try"] "datomic"]]]
       [:div {:style {:display "flex"}} nav
       [:main children]]

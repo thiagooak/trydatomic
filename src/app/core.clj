@@ -113,7 +113,10 @@
      :body (app.ui/page
             "Learn Datomic Datalog"
             (app.ui/nav chapters)
-            (if chapter (:content chapter) not-found-content))}))
+            (if chapter
+              (list (:content chapter)
+                    (apply app.ui/pager (app.chapters/neighbours chapters slug)))
+              not-found-content))}))
 
 (defroutes routes
   ;; In a real system, you would serve static files from a CDN

@@ -56,6 +56,6 @@
     :where
     [?e :pokemon/name "Pikachu"]]]
   [:p "The result is a bare map — easy to pass directly to the rest of your application."]
-  [:p [:strong "Try:"] " Add " [:code ":stat/attack"] " and " [:code ":stat/defense"] " to the selective pull pattern. "
-   "Or use " [:code "[*]"] " on a different Pokemon like \"Snorlax\" to explore all of its stored attributes."]
-  [:p [:a {:href "/input-params"} "Previous"] " | " [:a {:href "/rules"} "Next"]]]}
+  [:ui/try-tip
+   [:p "Add " [:code ":stat/attack"] " and " [:code ":stat/defense"] " to the selective pull pattern. "
+    "Or use " [:code "[*]"] " on a different Pokemon like \"Snorlax\" to explore all of its stored attributes."]]]}

@@ -52,7 +52,7 @@
   [:p "This returns all ~147 Pokemon that lack the " [:code ":pokemon/category"] " attribute. "
    "Try adding a stat like " [:code "[?e :stat/hp ?hp]"] " and including " [:code "?hp"]
    " in " [:code ":find"] " — " [:code "missing?"] " only filters; the rest of the query works normally."]
-  [:p [:strong "Try:"] " Modify the " [:code "not"] " query at the top to exclude a different type, like \"Ice\" or \"Dragon\". "
-   "Or flip the " [:code "missing?"] " demo to find " [:em "legendary"] " Pokemon by replacing "
-   [:code "missing?"] " with a pattern clause " [:code "[?e :pokemon/category :legendary]"] "."]
-  [:p [:a {:href "/predicates"} "Previous"] " | " [:a {:href "/or-clauses"} "Next"]]]}
+  [:ui/try-tip
+   [:p "Modify the " [:code "not"] " query at the top to exclude a different type, like \"Ice\" or \"Dragon\". "
+    "Or flip the " [:code "missing?"] " demo to find " [:em "legendary"] " Pokemon by replacing "
+    [:code "missing?"] " with a pattern clause " [:code "[?e :pokemon/category :legendary]"] "."]]]}

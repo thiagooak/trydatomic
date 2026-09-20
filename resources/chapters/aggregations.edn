@@ -80,7 +80,7 @@
     :where
     [?e :pokemon/type ?type]
     [?e :stat/speed ?speed]]]
-  [:p [:strong "Try:"] " Add " [:code "?type"] " as a grouping key to the "
-   [:code "avg"] " query to see average attack broken down by type. "
-   "Or use " [:code "(min ?attack)"] " and " [:code "(max ?attack)"] " together to see the attack range per type."]
-  [:p [:a {:href "/cardinality-many"} "Previous"] " | " [:a {:href "/find-specs"} "Next"]]]}
+  [:ui/try-tip
+   [:p "Add " [:code "?type"] " as a grouping key to the "
+    [:code "avg"] " query to see average attack broken down by type. "
+    "Or use " [:code "(min ?attack)"] " and " [:code "(max ?attack)"] " together to see the attack range per type."]]]}

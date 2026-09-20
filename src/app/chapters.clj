@@ -57,6 +57,14 @@
     load-chapters
     (memoize load-chapters)))
 
+(defn neighbours
+  "[previous next] for `slug` in the ordered `chapters`. Either is nil at the
+  ends of the list, and both are nil for an unknown slug."
+  [chapters slug]
+  (let [i (.indexOf ^java.util.List (mapv :slug chapters) slug)]
+    (when-not (neg? i)
+      [(get chapters (dec i)) (get chapters (inc i))])))
+
 (defn find-chapter
   "`slug` comes from the URL, so it is only ever matched against the already
   loaded chapters, never used to build a resource path."

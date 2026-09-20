@@ -94,8 +94,8 @@
   [:p "One important constraint: every recursive rule must have a " [:em "base case"] " "
    "(a non-recursive head) that eventually terminates the recursion. "
    "Datomic stops when a full pass through all rule heads derives no new results."]
-  [:p [:strong "Try:"] " Modify the " [:code "strong?"] " inline query to require both attack > 90 "
-   [:em "and"] " speed > 90 — see how many Pokemon meet both criteria. "
-   "Or change the " [:code "or-join"] " query to find Pokemon with attack > 130 "
-   [:em "or"] " special attack > 130."]
-  [:p [:a {:href "/pull"} "Previous"]]]}
+  [:ui/try-tip
+   [:p "Modify the " [:code "strong?"] " inline query to require both attack > 90 "
+    [:em "and"] " speed > 90 — see how many Pokemon meet both criteria. "
+    "Or change the " [:code "or-join"] " query to find Pokemon with attack > 130 "
+    [:em "or"] " special attack > 130."]]]}

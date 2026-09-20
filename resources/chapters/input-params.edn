@@ -90,7 +90,7 @@
 ;; call: (d/q query db [[\"Pikachu\" 30] [\"Charizard\" 70]])"]
   [:p "Each row in the input relation acts like a separate filter applied in parallel, "
    "then the results are unioned together."]
-  [:p [:strong "Try:"] " Change the speed range in the tuple-binding example to 50–70 to see which Pokemon fall in that band. "
-   "Or adapt the collection-binding equivalent to query for Grass, Fire, and Flying types all at once "
-   "using three " [:code "or"] " branches."]
-  [:p [:a {:href "/find-specs"} "Previous"] " | " [:a {:href "/pull"} "Next"]]]}
+  [:ui/try-tip
+   [:p "Change the speed range in the tuple-binding example to 50–70 to see which Pokemon fall in that band. "
+    "Or adapt the collection-binding equivalent to query for Grass, Fire, and Flying types all at once "
+    "using three " [:code "or"] " branches."]]]}

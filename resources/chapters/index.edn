@@ -15,5 +15,4 @@
     [?entity :pokemon/type "Grass"]
     [?entity :pokemon/name ?name]]]
   [:ui/try-tip
-   [:p "Edit the query above to return Pokémon of other types like Fire or Electric."]]
-  [:p [:a {:href "/querying" :class "button"} "Next Chapter →"]]]}
+   [:p "Edit the query above to return Pokémon of other types like Fire or Electric."]]]}
