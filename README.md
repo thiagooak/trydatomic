@@ -51,7 +51,7 @@ Chapters are EDN files in `resources/chapters/`.
 
 2. Add the slug to `resources/chapters/chapters.edn`. Its position sets the order in the nav. Files not listed there are not published.
 
-`:content` is plain [Hiccup](https://github.com/weavejester/hiccup). Three extra tags call functions from `app.ui`:
+`:content` is plain [Hiccup](https://github.com/weavejester/hiccup). Four extra tags call functions:
 
 | Tag | Renders |
 | --- | --- |
@@ -59,6 +59,7 @@ Chapters are EDN files in `resources/chapters/`.
 | `[:ui/code query]` | A read-only code block from data, pretty-printed. |
 | `[:ui/code lang string]` | A read-only code block from a string, shown as written. |
 | `[:ui/try-tip hiccup]` | A highlighted "TRY" box. |
+| `[:ui/value dataset query]` | The result of a scalar query, like `[:find (count ?e) . :where [?e :pokemon/name _]]`, shown as text. Use it for any number in the text that comes from the data, so the text can't go stale when the data changes. |
 
 In development the files are re-read on every request, so refreshing the browser shows your edits. `clojure -X:test` checks that every chapter loads and renders, and that every runnable query is allowed and executes.
 

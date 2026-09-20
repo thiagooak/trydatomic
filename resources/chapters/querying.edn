@@ -17,7 +17,9 @@
     :stat/speed      45}]
   [:p "Each key is an " [:strong "Attribute"] " (:pokemon/name, :stat/speed, etc"
    ") and each value is the " [:strong "Value"] " for that attribute on this entity (Bulbasaur, 45, etc)."]
-  [:p "In Datomic, every entity is assigned a unique " [:strong "entity ID"] ". "
+  [:p "Datomic assigns every entity a unique " [:strong "entity ID"] " when it is first added. "
+   "You never choose it. "
+   "(See " [:a {:href "https://docs.datomic.com/whatis/data-model.html"} "the Datomic data model"] ".) "
    "Let's find Bulbasaur's:"]
   [:ui/runnable "pokemon"
    [:find ?entity-id
@@ -51,7 +53,9 @@
    " and " [:a {:href "/rules"} "Rules"] " chapters."]
   [:p "Try changing \"Bulbasaur\" to another Pokemon name in the queries above."]
   [:p "Take a look at the "
-   [:a {:href "https://github.com/thiagooak/learn-datalog/blob/main/resources/pokemon.edn"} "EDN file"]
-   " defining all of the Pokemon in our database."]
+   [:a {:href "https://github.com/thiagooak/trydatomic/blob/main/resources/pokemon.edn?plain=1"} "EDN file"]
+   " defining all of the Pokemon in our database. "
+   "It is written as one transaction for each game generation, which the "
+   [:a {:href "/time-travel"} "Time travel"] " chapter explains."]
   [:p "Run the last query with a dual-typed Pokemon like \"Charizard\" and observe "
    "how many attribute-value rows appear — one for each fact stored about that entity."]]}

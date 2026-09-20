@@ -4,35 +4,61 @@
   chapters.edn is the manifest: an ordered vector of slugs. Every other file is
   a map {:nav-title \"...\" :content <hiccup>}, named after its slug.
 
-  Hiccup in :content may use [:ui/runnable ...], [:ui/code ...] and
-  [:ui/try-tip ...]. Those are expanded by calling the matching app.ui function."
+  Hiccup in :content may use [:ui/runnable ...], [:ui/code ...],
+  [:ui/try-tip ...] and [:ui/value ...]. Those are expanded by calling the
+  matching function."
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
+            [clojure.string :as str]
             [clojure.walk :as walk]
+            [datomic.client.api :as d]
+            [app.db :as db]
+            [app.find-spec :as find-spec]
             [app.ui :as ui]))
 
+(defn value
+  "The result of a scalar query, like [:find (count ?e) . :where ...], run when
+  the chapter is loaded. Use it for any number in the text that comes from the
+  data, so the text can't fall out of date when the data changes."
+  [dataset query]
+  (let [{:keys [query shape]} (find-spec/normalize query)]
+    (shape (d/q {:query query :args [(db/db-value dataset)]}))))
+
 (def components
-  "Whitelist of hiccup tags that call an app.ui function."
+  "Whitelist of hiccup tags that call a function."
   {:ui/runnable #'ui/runnable
    :ui/code     #'ui/code
-   :ui/try-tip  #'ui/try-tip})
+   :ui/try-tip  #'ui/try-tip
+   :ui/value    #'value})
 
 (defn- component? [form]
   (and (vector? form)
        (keyword? (first form))
        (= "ui" (namespace (first form)))))
 
+(defn- external-link? [form]
+  (and (vector? form)
+       (= :a (first form))
+       (map? (second form))
+       (some-> (:href (second form)) (str/starts-with? "http"))))
+
 (defn expand
-  "Replaces every [:ui/xxx & args] in `form` with the result of calling xxx."
+  "Replaces every [:ui/xxx & args] in `form` with the result of calling xxx.
+  Links to other sites open in a new tab, so nobody loses their place."
   [slug form]
   (walk/postwalk
    (fn [form]
-     (if (component? form)
+     (cond
+       (component? form)
        (if-let [component (components (first form))]
          (apply component (rest form))
          (throw (ex-info (str "Unknown component " (first form) " in chapter " slug)
                          {:slug slug :component (first form)})))
-       form))
+
+       (external-link? form)
+       (update form 1 assoc :target "_blank" :rel "noopener noreferrer")
+
+       :else form))
    form))
 
 (defn- read-resource [path]

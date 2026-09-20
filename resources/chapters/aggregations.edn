@@ -55,9 +55,14 @@
     :with ?e
     :where
     [?e :pokemon/type ?type]]]
-  [:p "The first result is the number of unique type names (around 15). "
-   "The second is the total number of type slots filled across all ~150 Pokemon "
-   "(higher, because dual-typed Pokemon contribute two entries each)."]
+  [:p "The first result, "
+   [:ui/value "pokemon" [:find (count-distinct ?type) . :where [_ :pokemon/type ?type]]]
+   ", is the number of unique type names. "
+   "The second, "
+   [:ui/value "pokemon" [:find (count ?type) . :with ?e :where [?e :pokemon/type ?type]]]
+   ", is the total number of type slots filled across all "
+   [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/name _]]]
+   " Pokemon. It is higher because dual-typed Pokemon contribute two entries each."]
 
   [:h2 "count-distinct"]
   [:p [:code "count-distinct"] " counts unique values of a variable within each group, "

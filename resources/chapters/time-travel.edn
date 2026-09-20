@@ -7,7 +7,7 @@
    "and a transaction is an entity like any other."]
   [:p "Because nothing is lost, the database is a " [:em "value"] " that you can ask about any earlier point. "
    "That is what makes Datomic's time travel possible, and it takes only a few lines of Datalog."]
-  [:p "The games changed these 151 Pokemon over the years, "
+  [:p "The games changed these " [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/name _]]] " Pokemon over the years, "
    "so our database was loaded the way it grew: one transaction for each game generation, "
    "holding what that generation changed. Generations III to V didn't change any of them. "
    "Their transactions only record that the generation happened."]

@@ -40,16 +40,19 @@
   [:h2 "missing?"]
   [:p [:code "missing?"] " checks that an entity has no value for a given attribute. "
    "Its arguments are the database binding " [:code "$"] ", the entity variable, and the attribute keyword."]
-  [:p "Our Pokemon database has an optional " [:code ":pokemon/category"] " attribute — "
-   "only Articuno, Zapdos, Moltres, and Mewtwo have it set to " [:code "true"] ". "
-   "Every other Pokemon is missing this attribute entirely. "
+  [:p "In our Pokemon database, only Articuno, Zapdos, Moltres, and Mewtwo have a "
+   [:code ":pokemon/category"] ", with the value " [:code ":legendary"] ". "
+   "In Datomic any entity can have any attribute, so for every other Pokemon that fact simply "
+   "doesn't exist: they are " [:em "missing"] " the attribute. "
    "Let's find all non-legendary Pokemon:"]
   [:ui/runnable "pokemon"
    [:find ?name
     :where
     [?e :pokemon/name ?name]
     [(missing? $ ?e :pokemon/category)]]]
-  [:p "This returns all ~147 Pokemon that lack the " [:code ":pokemon/category"] " attribute. "
+  [:p "This returns all "
+   [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/name _] [(missing? $ ?e :pokemon/category)]]]
+   " Pokemon that lack the " [:code ":pokemon/category"] " attribute. "
    "Try adding a stat like " [:code "[?e :stat/hp ?hp]"] " and including " [:code "?hp"]
    " in " [:code ":find"] " — " [:code "missing?"] " only filters; the rest of the query works normally."]
   [:ui/try-tip

@@ -98,3 +98,34 @@
       ;; what the Run button posts: the text in the editor. run-q refuses anything
       ;; unsafe, so running it is the safety check too.
       (is (some? (core/run-q dataset text))))))
+
+(deftest values-come-from-the-database
+  (is (= [:p 151] (chapters/expand "x" [:p [:ui/value "pokemon" '[:find (count ?e) . :where [?e :pokemon/name _]]]])))
+  (is (= 147 (chapters/value "pokemon" '[:find (count ?e) . :where [?e :pokemon/name _] [(missing? $ ?e :pokemon/category)]])))
+  (is (= 17 (chapters/value "pokemon" '[:find (count-distinct ?type) . :where [_ :pokemon/type ?type]])))
+  (is (= 218 (chapters/value "pokemon" '[:find (count ?type) . :with ?e :where [?e :pokemon/type ?type]])))
+  (testing "every value used in a chapter is a number"
+    (doseq [slug (all-slugs)
+            :let [raw (edn/read-string (slurp (io/resource (str "chapters/" slug ".edn"))))
+                  found (atom [])]]
+      (walk/postwalk (fn [form]
+                       (when (and (vector? form) (= :ui/value (first form))) (swap! found conj form))
+                       form)
+                     raw)
+      (doseq [[_ dataset query] @found]
+        (is (number? (chapters/value dataset query)) (str slug " " (pr-str query)))))))
+
+(deftest links-to-other-sites-open-in-a-new-tab
+  (is (= [:p [:a {:href "https://example.org" :target "_blank" :rel "noopener noreferrer"} "x"]
+          [:a {:href "/pull"} "p"]]
+         (chapters/expand "x" [:p [:a {:href "https://example.org"} "x"] [:a {:href "/pull"} "p"]])))
+  (testing "in every chapter"
+    (doseq [slug (all-slugs)
+            :let [links (atom [])]]
+      (walk/postwalk (fn [x]
+                       (when (and (vector? x) (= :a (first x)) (map? (second x))) (swap! links conj (second x)))
+                       x)
+                     (:content (chapters/load-chapter slug)))
+      (doseq [{:keys [href target]} @links
+              :when (str/starts-with? href "http")]
+        (is (= "_blank" target) (str slug " " href))))))
