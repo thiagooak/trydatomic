@@ -26,23 +26,52 @@
    "how to return a single value as a scalar."]
 
   [:h2 "avg and sum"]
-  [:p "Average attack across all Pokemon:"]
+  [:p [:code "avg"] " and " [:code "sum"] " look simple, but " [:strong "both queries below give the wrong answer"] ". "
+   "The next section explains why. Run them anyway, and see whether you can spot the problem first."]
+  [:p "Average attack across all Pokemon. Note the number you get:"]
   [:ui/runnable "pokemon"
    [:find (avg ?attack)
     :where
     [?e :stat/attack ?attack]]]
-  [:p "Sum of all HP values — a rough measure of total bulk across the Pokedex:"]
+  [:p "Now add up the HP of every Pokemon — a rough measure of total bulk across the Pokedex. "
+   "Before you run it, think about how many Pokemon there are and how much HP a typical one has, "
+   "then guess the total:"]
   [:ui/runnable "pokemon"
    [:find (sum ?hp)
     :where
     [?e :stat/hp ?hp]]]
+  [:p "The total is "
+   [:ui/value "pokemon" [:find (sum ?hp) . :where [?e :stat/hp ?hp]]]
+   " for "
+   [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/name _]]]
+   " Pokemon. That works out to about 20 HP each, far less than a typical Pokemon has. Something is off."]
 
   [:h2 "The :with clause"]
-  [:p "There is a subtle trap with cardinality/many attributes. "
+  [:p "The sum is too small because of how Datomic aggregates. "
    "Before aggregation, Datomic builds a " [:strong "set"] " from the " [:code ":find"] " variables. "
-   "Rows that look identical after projecting onto those variables are merged — "
-   "which can silently drop data you intended to aggregate."]
-  [:p "Compare these two queries. The first counts " [:em "distinct type strings"] " in the database:"]
+   "Rows that look identical after projecting onto those variables are merged. "
+   "The HP query has only one variable, " [:code "?hp"] ", so two Pokemon with the same HP "
+   "become a single row, and the second one is never added."]
+  [:p "The " [:code ":with"] " clause fixes this. A variable in " [:code ":with"] " keeps rows apart "
+   "before aggregation, but is not returned. Adding " [:code ":with ?e"] " keeps one row per Pokemon:"]
+  [:ui/runnable "pokemon"
+   [:find (sum ?hp)
+    :with ?e
+    :where
+    [?e :stat/hp ?hp]]]
+  [:p "The sum is now "
+   [:ui/value "pokemon" [:find (sum ?hp) . :with ?e :where [?e :stat/hp ?hp]]]
+   ". The average attack has the same problem, so here it is again with the fix:"]
+  [:ui/runnable "pokemon"
+   [:find (avg ?attack)
+    :with ?e
+    :where
+    [?e :stat/attack ?attack]]]
+  [:p "Compare it with the number you noted earlier: the average changed too. "
+   "A sum that is far too small is easy to notice, but an average that is a couple of points off "
+   "looks perfectly plausible. That is what makes this trap dangerous."]
+  [:p "The same thing happens with " [:code "count"] ". Compare these two queries. "
+   "The first counts " [:em "distinct type strings"] " in the database:"]
   [:ui/runnable "pokemon"
    [:find (count ?type)
     :where
@@ -63,6 +92,11 @@
    ", is the total number of type slots filled across all "
    [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/name _]]]
    " Pokemon. It is higher because dual-typed Pokemon contribute two entries each."]
+  [:p [:strong "When can you skip " [:code ":with"] "?"] " When rows cannot collapse, or when collapsing does not matter. "
+   [:code "(count ?name)"] " in the " [:code "count"] " section was safe because Pokemon names are unique, "
+   "so no two rows merge. " [:code "min"] " and " [:code "max"] " are immune because a duplicate never changes an extreme. "
+   "For " [:code "sum"] ", " [:code "avg"] " and " [:code "count"] " over a value that different Pokemon can share, "
+   "like HP, attack or type, add " [:code ":with ?e"] "."]
 
   [:h2 "count-distinct"]
   [:p [:code "count-distinct"] " counts unique values of a variable within each group, "
@@ -86,6 +120,9 @@
     [?e :pokemon/type ?type]
     [?e :stat/speed ?speed]]]
   [:ui/try-tip
-   [:p "Add " [:code "?type"] " as a grouping key to the "
-    [:code "avg"] " query to see average attack broken down by type. "
-    "Or use " [:code "(min ?attack)"] " and " [:code "(max ?attack)"] " together to see the attack range per type."]]]}
+   [:p "Add " [:code "?type"] " as a grouping key to the " [:code "avg"] " query with "
+    [:code ":with ?e"] " to see average attack broken down by type. You will need a "
+    [:code "[?e :pokemon/type ?type]"] " clause too, and if you drop " [:code ":with ?e"]
+    " the Pokemon that share an attack within a type merge again. "
+    "Or use " [:code "(min ?attack)"] " and " [:code "(max ?attack)"] " together to see the attack range per type. "
+    "Those need no " [:code ":with"] "."]]]}
