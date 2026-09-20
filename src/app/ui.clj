@@ -9,8 +9,8 @@
     (slurp resource)
     "dev"))
 
-(defn nav-li [m]
-  [:li [:a {:href (str "/" (key m))} (:nav-title (val m))]])
+(defn nav-li [{:keys [slug nav-title]}]
+  [:li [:a {:href (if (= slug "index") "/" (str "/" slug))} nav-title]])
 
 (defn nav [chapters]
   [:nav [:ul

@@ -33,6 +33,35 @@ Build an uberjar:
 clojure -T:build uber
 ```
 
+## Adding a chapter
+
+Chapters are EDN files in `resources/chapters/`.
+
+1. Create `resources/chapters/<slug>.edn`. The slug becomes the URL (`/<slug>`):
+
+   ```clojure
+   {:nav-title "My chapter"
+    :content
+    [:div
+     [:h1 "My chapter"]
+     [:p "Some text."]
+     [:ui/runnable "pokemon" [:find ?name :where [?e :pokemon/name ?name]]]
+     [:ui/try-tip [:p "Change the query above."]]]}
+   ```
+
+2. Add the slug to `resources/chapters/chapters.edn`. Its position sets the order in the nav. Files not listed there are not published.
+
+`:content` is plain [Hiccup](https://github.com/weavejester/hiccup). Three extra tags call functions from `app.ui`:
+
+| Tag | Renders |
+| --- | --- |
+| `[:ui/runnable dataset query]` | An editable query with Run and Reset buttons. |
+| `[:ui/code query]` | A read-only code block from data, pretty-printed. |
+| `[:ui/code lang string]` | A read-only code block from a string, shown as written. |
+| `[:ui/try-tip hiccup]` | A highlighted "TRY" box. |
+
+In development the files are re-read on every request, so refreshing the browser shows your edits. `clojure -X:test` checks that every chapter loads and renders, and that every runnable query is allowed and executes.
+
 ## Deployment
 
 ```shell

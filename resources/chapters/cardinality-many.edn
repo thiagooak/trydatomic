@@ -1,0 +1,56 @@
+{:nav-title "Cardinality many"
+ :content
+ [:div
+  [:h1 "Cardinality Many"]
+  [:p "Most attributes hold a single value per entity — " [:code ":db.cardinality/one"] ". "
+   "But " [:code ":pokemon/type"] " is declared " [:code ":db.cardinality/many"] ", "
+   "meaning an entity can have multiple values for the same attribute."]
+  [:p "In the schema this looks like:"]
+  [:ui/code {:db/ident       :pokemon/type
+             :db/valueType   :db.type/string
+             :db/cardinality :db.cardinality/many}]
+  [:p "The consequence for queries is important: "
+   "binding a cardinality/many attribute produces " [:strong "one result row per value"] ". "
+   "Let's see it in action — run this query and notice how Bulbasaur appears twice:"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?type
+    :where
+    [?e :pokemon/name ?name]
+    [?e :pokemon/type ?type]
+    (or [?e :pokemon/name "Bulbasaur"]
+        [?e :pokemon/name "Charmander"])]]
+  [:p "Bulbasaur has two type values (Grass and Poison) so it produces two rows. "
+   "Charmander is pure Fire so it produces one."]
+
+  [:h2 "Finding dual-type Pokemon"]
+  [:p "We can use the multi-row behaviour to our advantage. "
+   "By joining " [:code ":pokemon/type"] " to itself under two different variable names, "
+   "we get all pairs of types on the same entity. "
+   "Filtering with " [:code "not="] " keeps only the pairs where the two values differ — "
+   "that is, entities that carry at least two distinct types:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?e :pokemon/name ?name]
+    [?e :pokemon/type ?type1]
+    [?e :pokemon/type ?type2]
+    [(not= ?type1 ?type2)]]]
+  [:p "Because " [:code ":find"] " returns a " [:strong "set"] " of tuples, each name appears only once "
+   "even though many " [:code "(?type1, ?type2)"] " combinations matched."]
+
+  [:h2 "Counting values with aggregation"]
+  [:p "We can count how many type values each Pokemon has by using the "
+   [:code "count"] " aggregate in " [:code ":find"] ". "
+   "This is a preview of the next chapter — for now just observe that "
+   [:code "count"] " collapses all the type rows for one entity into a single number:"]
+  [:ui/runnable "pokemon"
+   [:find ?name (count ?type)
+    :where
+    [?e :pokemon/name ?name]
+    [?e :pokemon/type ?type]]]
+  [:p "Pokemon with a count of 2 are dual-typed. Those with 1 are single-typed. "
+   "You can sort by the count column in the results to spot the dual-types quickly."]
+  [:p [:strong "Try:"] " Modify the dual-type query to also return " [:code "?type1"] " and "
+   [:code "?type2"] " in " [:code ":find"] " to see which type combinations appear. "
+   "Or change the " [:code "or"] " filter in the first query to show Bulbasaur and Pikachu side by side."]
+  [:p [:a {:href "/or-clauses"} "Previous"] " | " [:a {:href "/aggregations"} "Next"]]]}

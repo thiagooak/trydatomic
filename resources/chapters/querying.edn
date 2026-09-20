@@ -1,0 +1,53 @@
+{:nav-title "Querying"
+ :content
+ [:div
+  [:h1 "Querying Basics"]
+  [:p "Before we continue, let's take a closer look at the data model powering our Pokemon database."]
+  [:p "Each Pokemon is stored as an " [:strong "Entity"] ". Here is what Bulbasaur looks like:"]
+  [:ui/code
+   {:pokemon/name    "Bulbasaur",
+    :pokemon/number  "001",
+    :pokemon/type    ["Grass" "Poison"],
+    :stat/attack     49,
+    :stat/defense    49,
+    :stat/hp         45,
+    :stat/sp-attack  65,
+    :stat/sp-defense 65,
+    :stat/speed      45}]
+  [:p "Each key is an " [:strong "Attribute"] " (:pokemon/name, :stat/speed, etc"
+   ") and each value is the " [:strong "Value"] " for that attribute on this entity (Bulbasaur, 45, etc)."]
+  [:p "In Datomic, every entity is assigned a unique " [:strong "entity ID"] ". "
+   "Let's find Bulbasaur's:"]
+  [:ui/runnable "pokemon"
+   [:find ?entity-id
+    :where [?entity-id :pokemon/name "Bulbasaur"]]]
+  [:p "Now that we have the concept of an entity ID, we can flip the query around and ask: "
+   "what Attributes does this entity have? "
+   "We bind the attribute position to a logic variable, then resolve its human-readable name via "
+   [:code ":db/ident"] ":"]
+  [:ui/runnable "pokemon"
+   [:find ?attribute
+    :where
+    [?entity-id :pokemon/name "Bulbasaur"]
+    [?entity-id ?attribute-id _]
+    [?attribute-id :db/ident ?attribute]]]
+  [:p "The underscore " [:code "_"] " in the third position is a wildcard, it matches any value but does not bind it to a variable."]
+  [:p "Finally, we can pull all attribute-value pairs at once by binding the value position too:"]
+  [:ui/runnable "pokemon"
+   [:find ?attribute ?value
+    :where
+    [?entity-id :pokemon/name "Bulbasaur"]
+    [?entity-id ?attribute-id ?value]
+    [?attribute-id :db/ident ?attribute]]]
+  [:p "This works because of Datomic's "
+   [:a {:href "https://docs.datomic.com/whatis/data-model.html#universal"} "Universal Schema"]
+   ". Every fact in the database is stored following this Entity-Attribute-Value structure. "
+   "Attributes are themselves entities, which is why we can traverse from "
+   [:code "?attribute-id"] " to " [:code ":db/ident"] " to get the keyword name."]
+  [:p "Try changing \"Bulbasaur\" to another Pokemon name in the queries above."]
+  [:p "Take a look at the "
+   [:a {:href "https://github.com/thiagooak/learn-datalog/blob/main/resources/pokemon.edn"} "EDN file"]
+   " defining all of the Pokemon in our database."]
+  [:p "Run the last query with a dual-typed Pokemon like \"Charizard\" and observe "
+   "how many attribute-value rows appear — one for each fact stored about that entity."]
+  [:p [:a {:href "/" :class "button"} "← Previous Chapter"] " | " [:a {:href "/predicates"} "Next"]]]}

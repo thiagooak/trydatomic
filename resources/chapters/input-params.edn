@@ -1,0 +1,96 @@
+{:nav-title "Input params"
+ :content
+ [:div
+  [:h1 "Input Parameters"]
+  [:p "Every query so far has had its filter values written directly into the query string. "
+   "The " [:code ":in"] " clause lets you declare named input bindings so the same query "
+   "can be called with different values at runtime — exactly like function parameters."]
+  [:p "The database itself is always the first input, conventionally named " [:code "$"] ". "
+   "Additional inputs follow:"]
+  [:ui/code "[:find ?name
+ :in   $ ?type
+ :where [?e :pokemon/name ?name]
+        [?e :pokemon/type ?type]]"]
+  [:p "In Clojure you would call this query like:"]
+  [:ui/code "(d/q '[:find ?name
+       :in   $ ?type
+       :where [?e :pokemon/name ?name]
+              [?e :pokemon/type ?type]]
+     db \"Fire\")"]
+  [:p "The interactive demos on this site run queries with only the database as input, "
+   "so the examples below show the equivalent queries with values inlined. "
+   "The syntax and results are identical to what you would get with parameterised " [:code ":in"] " inputs."]
+
+  [:h2 "Single scalar"]
+  [:p "A bare variable in " [:code ":in"] " binds a single scalar value. "
+   "This is the most common form — find all Pokemon of a given type:"]
+  [:ui/code ";; parameterised form
+[:find ?name
+ :in   $ ?type
+ :where [?e :pokemon/name ?name]
+        [?e :pokemon/type ?type]]
+;; call: (d/q query db \"Fire\")"]
+  [:p "Equivalent runnable query with the value inlined:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?e :pokemon/name ?name]
+    [?e :pokemon/type "Fire"]]]
+
+  [:h2 "Collection binding"]
+  [:p "Wrap the variable in " [:code "[?var ...]"] " inside " [:code ":in"] " to accept "
+   "a collection of values. The query matches any entity whose attribute value "
+   "appears in the collection — like SQL's " [:code "IN (...)"] ":"]
+  [:ui/code ";; parameterised form
+[:find ?name ?type
+ :in   $ [?type ...]
+ :where [?e :pokemon/name ?name]
+        [?e :pokemon/type ?type]]
+;; call: (d/q query db [\"Fire\" \"Water\" \"Electric\"])"]
+  [:p "Equivalent runnable query — note how the result is the union of all three types, "
+   "which is exactly what collection binding achieves at the call site:"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?type
+    :where
+    [?e :pokemon/name ?name]
+    [?e :pokemon/type ?type]
+    (or [?e :pokemon/type "Fire"]
+        [?e :pokemon/type "Water"]
+        [?e :pokemon/type "Electric"])]]
+
+  [:h2 "Tuple binding"]
+  [:p "Wrap multiple variables in " [:code "[?a ?b]"] " inside " [:code ":in"] " to destructure "
+   "a single input tuple. Useful for passing a pair of related values like a range:"]
+  [:ui/code ";; parameterised form
+[:find ?name ?speed
+ :in   $ [?min-speed ?max-speed]
+ :where [?e :pokemon/name ?name]
+        [?e :stat/speed ?speed]
+        [(>= ?speed ?min-speed)]
+        [(<= ?speed ?max-speed)]]
+;; call: (d/q query db [80 100])"]
+  [:p "Equivalent runnable query with the range values inlined:"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?speed
+    :where
+    [?e :pokemon/name ?name]
+    [?e :stat/speed ?speed]
+    [(>= ?speed 80)]
+    [(<= ?speed 100)]]]
+
+  [:h2 "Relation binding"]
+  [:p "A relation binding accepts a collection of tuples — like a mini in-memory table. "
+   "Each tuple is destructured into the declared variables:"]
+  [:ui/code ";; parameterised form — look up multiple Pokemon by name
+[:find ?name ?hp
+ :in   $ [[?name ?min-hp]]
+ :where [?e :pokemon/name ?name]
+        [?e :stat/hp ?hp]
+        [(>= ?hp ?min-hp)]]
+;; call: (d/q query db [[\"Pikachu\" 30] [\"Charizard\" 70]])"]
+  [:p "Each row in the input relation acts like a separate filter applied in parallel, "
+   "then the results are unioned together."]
+  [:p [:strong "Try:"] " Change the speed range in the tuple-binding example to 50–70 to see which Pokemon fall in that band. "
+   "Or adapt the collection-binding equivalent to query for Grass, Fire, and Flying types all at once "
+   "using three " [:code "or"] " branches."]
+  [:p [:a {:href "/find-specs"} "Previous"] " | " [:a {:href "/pull"} "Next"]]]}

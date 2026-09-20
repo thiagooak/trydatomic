@@ -1,0 +1,58 @@
+{:nav-title "Negation"
+ :content
+ [:div
+  [:h1 "Negation"]
+  [:p "Sometimes you want to exclude results rather than include them. "
+   "Datomic provides three tools for this: " [:code "not"] ", "
+   [:code "not-join"] ", and " [:code "missing?"] "."]
+
+  [:h2 "not"]
+  [:p [:code "not"] " excludes any entity for which the inner pattern matches. "
+   "Variables already bound in the outer query are automatically joined. "
+   "Let's find Pokemon that are not Grass type:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?e :pokemon/name ?name]
+    (not [?e :pokemon/type "Grass"])]]
+  [:p "Because " [:code ":pokemon/type"] " is cardinality/many, this excludes Pokemon that have "
+   [:em "any"] " Grass entry — so Bulbasaur (Grass/Poison) is excluded. "
+   "Try changing \"Grass\" to \"Fire\" or \"Water\"."]
+
+  [:h2 "not-join"]
+  [:p [:code "not-join"] " works like " [:code "not"] " but lets you introduce fresh variables "
+   "inside the negation that are only used there. "
+   "You declare explicitly which outer variables to join."]
+  [:p "Here we find " [:strong "single-type Pokemon"] " — those for which there is no second, "
+   "different type value:"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?type
+    :where
+    [?e :pokemon/name ?name]
+    [?e :pokemon/type ?type]
+    (not-join [?e ?type]
+              [?e :pokemon/type ?other]
+              [(not= ?type ?other)])]]
+  [:p "For each " [:code "?name"] "/" [:code "?type"] " pair, "
+   [:code "not-join"] " checks whether a different type value " [:code "?other"] " exists on the same entity. "
+   "If it does, the row is dropped — leaving only single-type Pokemon."]
+
+  [:h2 "missing?"]
+  [:p [:code "missing?"] " checks that an entity has no value for a given attribute. "
+   "Its arguments are the database binding " [:code "$"] ", the entity variable, and the attribute keyword."]
+  [:p "Our Pokemon database has an optional " [:code ":pokemon/category"] " attribute — "
+   "only Articuno, Zapdos, Moltres, and Mewtwo have it set to " [:code "true"] ". "
+   "Every other Pokemon is missing this attribute entirely. "
+   "Let's find all non-legendary Pokemon:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?e :pokemon/name ?name]
+    [(missing? $ ?e :pokemon/category)]]]
+  [:p "This returns all ~147 Pokemon that lack the " [:code ":pokemon/category"] " attribute. "
+   "Try adding a stat like " [:code "[?e :stat/hp ?hp]"] " and including " [:code "?hp"]
+   " in " [:code ":find"] " — " [:code "missing?"] " only filters; the rest of the query works normally."]
+  [:p [:strong "Try:"] " Modify the " [:code "not"] " query at the top to exclude a different type, like \"Ice\" or \"Dragon\". "
+   "Or flip the " [:code "missing?"] " demo to find " [:em "legendary"] " Pokemon by replacing "
+   [:code "missing?"] " with a pattern clause " [:code "[?e :pokemon/category :legendary]"] "."]
+  [:p [:a {:href "/predicates"} "Previous"] " | " [:a {:href "/or-clauses"} "Next"]]]}

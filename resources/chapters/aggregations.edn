@@ -1,0 +1,86 @@
+{:nav-title "Aggregations"
+ :content
+ [:div
+  [:h1 "Aggregations"]
+  [:p "Aggregation functions sit inside " [:code ":find"] " and collapse multiple rows into a single value. "
+   "Any non-aggregated variable in " [:code ":find"] " becomes a grouping key — "
+   "like SQL's " [:code "GROUP BY"] "."]
+
+  [:h2 "count"]
+  [:p "How many Pokemon belong to each type? "
+   [:code "?type"] " is the grouping key; " [:code "(count ?name)"] " counts entries per group:"]
+  [:ui/runnable "pokemon"
+   [:find ?type (count ?name)
+    :where
+    [?e :pokemon/name ?name]
+    [?e :pokemon/type ?type]]]
+
+  [:h2 "min and max"]
+  [:p "What is the highest and lowest speed in the Pokedex?"]
+  [:ui/runnable "pokemon"
+   [:find (min ?speed) (max ?speed)
+    :where
+    [?e :stat/speed ?speed]]]
+  [:p "Add " [:code "?name"] " as a grouping key to see each Pokemon's speed alongside the extremes "
+   "within its group — or move on to the Find Specifications chapter where you'll learn "
+   "how to return a single value as a scalar."]
+
+  [:h2 "avg and sum"]
+  [:p "Average attack across all Pokemon:"]
+  [:ui/runnable "pokemon"
+   [:find (avg ?attack)
+    :where
+    [?e :stat/attack ?attack]]]
+  [:p "Sum of all HP values — a rough measure of total bulk across the Pokedex:"]
+  [:ui/runnable "pokemon"
+   [:find (sum ?hp)
+    :where
+    [?e :stat/hp ?hp]]]
+
+  [:h2 "The :with clause"]
+  [:p "There is a subtle trap with cardinality/many attributes. "
+   "Before aggregation, Datomic builds a " [:strong "set"] " from the " [:code ":find"] " variables. "
+   "Rows that look identical after projecting onto those variables are merged — "
+   "which can silently drop data you intended to aggregate."]
+  [:p "Compare these two queries. The first counts " [:em "distinct type strings"] " in the database:"]
+  [:ui/runnable "pokemon"
+   [:find (count ?type)
+    :where
+    [?e :pokemon/type ?type]]]
+  [:p "The second uses " [:code ":with"] " to include " [:code "?e"] " in the pre-aggregation set, "
+   "preventing type strings from collapsing across entities. "
+   "It counts total " [:em "type assignments"] " across all Pokemon:"]
+  [:ui/runnable "pokemon"
+   [:find (count ?type)
+    :with ?e
+    :where
+    [?e :pokemon/type ?type]]]
+  [:p "The first result is the number of unique type names (around 15). "
+   "The second is the total number of type slots filled across all ~150 Pokemon "
+   "(higher, because dual-typed Pokemon contribute two entries each)."]
+
+  [:h2 "count-distinct"]
+  [:p [:code "count-distinct"] " counts unique values of a variable within each group, "
+   "ignoring duplicates. Its difference from " [:code "count"] " becomes visible when "
+   [:code ":with"] " introduces duplicate rows. "
+   "These two queries group by type and measure speed values in each group. "
+   "With " [:code ":with ?e"] ", the same speed can appear multiple times (once per Pokemon with that type). "
+   [:code "count"] " tallies every speed slot; " [:code "count-distinct"] " collapses repeated speeds:"]
+  [:ui/runnable "pokemon"
+   [:find ?type (count ?speed)
+    :with ?e
+    :where
+    [?e :pokemon/type ?type]
+    [?e :stat/speed ?speed]]]
+  [:p "Now the same query using " [:code "count-distinct"] " — for types where multiple Pokemon "
+   "share a speed value, the count will be lower:"]
+  [:ui/runnable "pokemon"
+   [:find ?type (count-distinct ?speed)
+    :with ?e
+    :where
+    [?e :pokemon/type ?type]
+    [?e :stat/speed ?speed]]]
+  [:p [:strong "Try:"] " Add " [:code "?type"] " as a grouping key to the "
+   [:code "avg"] " query to see average attack broken down by type. "
+   "Or use " [:code "(min ?attack)"] " and " [:code "(max ?attack)"] " together to see the attack range per type."]
+  [:p [:a {:href "/cardinality-many"} "Previous"] " | " [:a {:href "/find-specs"} "Next"]]]}

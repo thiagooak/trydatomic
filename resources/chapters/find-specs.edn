@@ -1,0 +1,61 @@
+{:nav-title "Find specs"
+ :content
+ [:div
+  [:h1 "Find Specifications"]
+  [:p "Every query so far has used the default " [:code ":find"] " form, "
+   "which returns a " [:strong "set of tuples"] ". "
+   "Datomic Datalog offers four distinct find specifications, each returning a different shape. "
+   "Choosing the right one makes downstream code simpler."]
+
+  [:h2 "Relation (default) — set of tuples"]
+  [:p "The standard form. Each variable becomes a column; each matching combination becomes a row. "
+   "Order within the set is not guaranteed."]
+  [:ui/runnable "pokemon"
+   [:find ?name ?speed
+    :where
+    [?e :pokemon/name ?name]
+    [?e :stat/speed ?speed]
+    [(> ?speed 100)]]]
+
+  [:h2 "Collection — flat vector of one variable"]
+  [:p "Wrap a single variable in " [:code "[?var ...]"] " to get a flat vector of its values "
+   "instead of a set of single-element tuples. "
+   "Useful when you only care about one column and want to pass it directly to other code:"]
+  [:ui/runnable "pokemon"
+   [:find [?name ...]
+    :where
+    [?e :pokemon/name ?name]
+    [?e :stat/speed ?speed]
+    [(> ?speed 100)]]]
+
+  [:h2 "Scalar — single value"]
+  [:p "Append " [:code "."] " after the variable to return exactly one value instead of a collection. "
+   "When multiple rows match, which one you get is arbitrary — "
+   "so scalars are most useful with aggregations that already produce a single row, "
+   "like " [:code "(max ...)"] ":"]
+  [:ui/runnable "pokemon"
+   [:find (max ?speed) .
+    :where
+    [?e :stat/speed ?speed]]]
+  [:p "Without the " [:code "."] " this would return " [:code "#{[110]}"] " — "
+   "a set containing one single-element tuple. "
+   "With it you get the bare number " [:code "110"] "."]
+
+  [:h2 "Tuple — single row"]
+  [:p "Wrap multiple variables in " [:code "[?a ?b]"] " (no " [:code "..."] ") "
+   "to return exactly one tuple. "
+   "Like the scalar form, it is most reliable when the query is guaranteed to match one row — "
+   "for example, a lookup by a unique attribute:"]
+  [:ui/runnable "pokemon"
+   [:find [?number ?type ?speed]
+    :where
+    [?e :pokemon/name "Pikachu"]
+    [?e :pokemon/number ?number]
+    [?e :pokemon/type ?type]
+    [?e :stat/speed ?speed]]]
+  [:p "Pikachu has exactly one entry in the database so this is safe. "
+   "The result is a plain vector " [:code "[\"025\" \"Electric\" 90]"] " "
+   "rather than a set of tuples — easy to destructure directly in Clojure."]
+  [:p [:strong "Try:"] " Use the tuple find spec to look up a different Pokemon — try \"Mewtwo\" or \"Snorlax\". "
+   "Or combine the scalar spec with " [:code "(min ?speed)"] " to return just the single lowest speed value in the Pokedex."]
+  [:p [:a {:href "/aggregations"} "Previous"]]]}

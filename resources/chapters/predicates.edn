@@ -1,0 +1,44 @@
+{:nav-title "Predicates"
+ :content
+ [:div
+  [:h1 "Filtering with Predicates"]
+  [:p "In the previous chapter we matched patterns by specifying exact values like "
+   [:code "\"Bulbasaur\""] ". Predicates let us filter rows using arbitrary truthy expressions."]
+  [:p "A predicate clause is a function call wrapped in an extra pair of brackets:"]
+  [:ui/code "[( > ?speed 100 )]"]
+  [:p "Every variable used in the predicate must already be bound by an earlier pattern clause. "
+   "Let's find all Pokemon with a speed stat above 100:"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?speed
+    :where
+    [?e :pokemon/name ?name]
+    [?e :stat/speed ?speed]
+    [(> ?speed 100)]]]
+  [:p "We can compare two bound variables against each other. "
+   "Here are the Pokemon whose defense is strictly higher than their attack:"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?attack ?defense
+    :where
+    [?e :pokemon/name ?name]
+    [?e :stat/attack ?attack]
+    [?e :stat/defense ?defense]
+    [(> ?defense ?attack)]]]
+  [:p "Predicates work on strings too, this site allows "
+   [:code "clojure.string/starts-with?"] " and " [:code "clojure.string/includes?"]
+   "; in a real Datomic app, any Clojure function is available. "
+   "Here we find Pokemon whose name starts with \"S\":"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?e :pokemon/name ?name]
+    [(clojure.string/starts-with? ?name "S")]]]
+  [:p "Or find Pokemon whose name contains \"saur\":"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?e :pokemon/name ?name]
+    [(clojure.string/includes? ?name "saur")]]]
+  [:p [:strong "Try:"] " Combine two predicates to find Pokemon whose name starts with \"S\" "
+   [:em "and"] " whose speed is above 100. "
+   "Or find Pokemon whose attack " [:em "and"] " defense are both above 80."]
+  [:p [:a {:href "/querying"} "Previous"] " | " [:a {:href "/negation"} "Next"]]]}

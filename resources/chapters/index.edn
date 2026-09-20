@@ -1,0 +1,19 @@
+{:nav-title "Index"
+ :content
+ [:div
+  [:h1 "Learn Datomic Datalog"]
+  [:p "This interactive website will help you learn how to query a Datomic database using Datalog."]
+  [:p "Datalog is a declarative, logic-based query language. Like SQL, you describe "
+   [:em "what"] " you want rather than " [:em "how"] " to find it. Unlike SQL, Datalog works by "
+   "matching " [:strong "patterns"] " against facts, making it a natural fit for Datomic's "
+   "data model. By the end of this guide you will be able to filter, aggregate, "
+   "and traverse relationships across a real database of all 151 original Pokémon."]
+  [:p "Click the \"Run\" button below to run your first Datomic Datalog query."]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?entity :pokemon/type "Grass"]
+    [?entity :pokemon/name ?name]]]
+  [:ui/try-tip
+   [:p "Edit the query above to return Pokémon of other types like Fire or Electric."]]
+  [:p [:a {:href "/querying" :class "button"} "Next Chapter →"]]]}

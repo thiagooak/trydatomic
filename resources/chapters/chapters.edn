@@ -1,0 +1,13 @@
+["index"
+ ;; "modeling-data"
+ "querying"
+ "predicates"
+ "negation"
+ "or-clauses"
+ "cardinality-many"
+ "aggregations"
+ "find-specs"
+ ;; "input-params"
+ ;; "pull"
+ ;; "rules"
+ ]

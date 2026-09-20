@@ -9,7 +9,7 @@
             [datomic.client.api :as d]
             [app.db]
             [app.ui]
-            [app.content])
+            [app.chapters])
   (:gen-class))
 
 (defn find-fns [form]
@@ -42,6 +42,21 @@
           :timeout 500
           :args [db]})))
 
+(def not-found-content
+  [:div
+   [:h1 "Page not found"]
+   [:p [:a {:href "/"} "Back to the start"]]])
+
+(defn chapter-response [slug]
+  (let [chapters (app.chapters/chapters)
+        chapter (app.chapters/find-chapter chapters slug)]
+    {:status (if chapter 200 404)
+     :headers {"Content-Type" "text/html"}
+     :body (app.ui/page
+            "Learn Datomic Datalog"
+            (app.ui/nav chapters)
+            (if chapter (:content chapter) not-found-content))}))
+
 (defroutes routes
   ;; In a real system, you would serve static files from a CDN
   (route/files "/" {:root "public"})
@@ -64,21 +79,9 @@
                                   (with-out-str))
                                 (catch Exception e (str e)))})}))
 
-  (GET "/" _
-    {:status 200
-     :headers {"Content-Type" "text/html"}
-     :body (app.ui/page
-            "Learn Datomic Datalog"
-            (app.ui/nav app.content/chapters)
-            (app.content/one))})
+  (GET "/" _ (chapter-response "index"))
 
-  (GET "/:chapter" [chapter]
-    {:status 200
-     :headers {"Content-Type" "text/html"}
-     :body (app.ui/page
-            "Learn Datomic Datalog"
-            (app.ui/nav app.content/chapters)
-            ((:content (get app.content/chapters chapter))))}))
+  (GET "/:chapter" [chapter] (chapter-response chapter)))
 
 (defn run-server [port]
   (println (str "Server is listening on: http://localhost:" port))

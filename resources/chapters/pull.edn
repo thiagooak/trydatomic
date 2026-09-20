@@ -1,0 +1,61 @@
+{:nav-title "Pull"
+ :content
+ [:div
+  [:h1 "Pull Expressions"]
+  [:p "Every query so far has listed each desired attribute as a separate " [:code ":find"] " variable. "
+   "Pull lets you retrieve a whole entity — or a chosen subset of its attributes — "
+   "as a single map, without enumerating every binding explicitly."]
+  [:p "The syntax is " [:code "(pull ?e pattern)"] " inside " [:code ":find"] ", "
+   "where " [:code "pattern"] " is a vector of attribute keywords (or " [:code "[*]"] " for all of them)."]
+
+  [:h2 "Selective pull"]
+  [:p "List only the attributes you care about. "
+   "Here we fetch name and speed for every Pokemon faster than 100, "
+   "getting back one map per entity instead of a two-column tuple:"]
+  [:ui/runnable "pokemon"
+   [:find (pull ?e [:pokemon/name :stat/speed])
+    :where
+    [?e :stat/speed ?speed]
+    [(> ?speed 100)]]]
+  [:p "Each result row contains a single map. "
+   "This is especially useful when returning wide entities — "
+   "compare pull with the equivalent multi-variable find:"]
+  [:ui/code ";;  multi-variable :find — verbose for many attributes
+[:find ?name ?hp ?attack ?defense ?sp-attack ?sp-defense ?speed
+ :where [?e :pokemon/name ?name]
+        [?e :stat/hp ?hp]
+        [?e :stat/attack ?attack]
+        [?e :stat/defense ?defense]
+        [?e :stat/sp-attack ?sp-attack]
+        [?e :stat/sp-defense ?sp-defense]
+        [?e :stat/speed ?speed]]
+
+;; pull — concise, same result shape
+[:find (pull ?e [:pokemon/name :stat/hp :stat/attack :stat/defense
+                 :stat/sp-attack :stat/sp-defense :stat/speed])
+ :where [?e :stat/speed ?speed]
+        [(> ?speed 100)]]"]
+
+  [:h2 "Wildcard pull"]
+  [:p "Use " [:code "[*]"] " to pull every attribute on the entity, "
+   "including Datomic's own " [:code ":db/id"] ":"]
+  [:ui/runnable "pokemon"
+   [:find (pull ?e [*])
+    :where
+    [?e :pokemon/name "Charizard"]]]
+  [:p "The wildcard is handy for exploration and debugging. "
+   "In production code, prefer listing attributes explicitly "
+   "so the shape of your data is clear and stable."]
+
+  [:h2 "Pull with scalar find spec"]
+  [:p "Combine pull with the scalar find spec (" [:code "."] ") "
+   "to get a single entity map with no wrapping set or tuple:"]
+  [:ui/runnable "pokemon"
+   [:find (pull ?e [:pokemon/name :pokemon/number
+                    :pokemon/type :stat/hp :stat/speed]) .
+    :where
+    [?e :pokemon/name "Pikachu"]]]
+  [:p "The result is a bare map — easy to pass directly to the rest of your application."]
+  [:p [:strong "Try:"] " Add " [:code ":stat/attack"] " and " [:code ":stat/defense"] " to the selective pull pattern. "
+   "Or use " [:code "[*]"] " on a different Pokemon like \"Snorlax\" to explore all of its stored attributes."]
+  [:p [:a {:href "/input-params"} "Previous"] " | " [:a {:href "/rules"} "Next"]]]}

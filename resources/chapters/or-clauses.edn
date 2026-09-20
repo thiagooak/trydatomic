@@ -1,0 +1,53 @@
+{:nav-title "Or clauses"
+ :content
+ [:div
+  [:h1 "Or Clauses"]
+  [:p "Pattern clauses in " [:code ":where"] " are implicitly joined with AND — every clause must match. "
+   "To express OR logic, Datomic Datalog provides " [:code "or"] " and " [:code "or-join"] "."]
+
+  [:h2 "or"]
+  [:p [:code "or"] " succeeds when " [:em "at least one"] " of its branches matches. "
+   "All branches must use the same set of variables. "
+   "Let's find Pokemon that are Fire " [:em "or"] " Water type:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?e :pokemon/name ?name]
+    (or [?e :pokemon/type "Fire"]
+        [?e :pokemon/type "Water"])]]
+  [:p "Try adding a third branch for \"Electric\"."]
+  [:p "You can also use " [:code "or"] " to match against multiple values of the same attribute — "
+   "here we find pure Fire-type or pure Water-type Pokemon by adding a second clause "
+   "that rules out dual types:"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?type
+    :where
+    [?e :pokemon/name ?name]
+    [?e :pokemon/type ?type]
+    (or [?e :pokemon/type "Fire"]
+        [?e :pokemon/type "Water"])
+    (not-join [?e ?type]
+              [?e :pokemon/type ?other]
+              [(not= ?type ?other)])]]
+
+  [:h2 "or-join"]
+  [:p [:code "or-join"] " works like " [:code "or"] " but you declare explicitly which outer variables "
+   "each branch must bind. This is required when branches introduce " [:em "different"] " local variables."]
+  [:p "Here we find Pokemon that are either Electric-type " [:em "or"] " have a speed above 100. "
+   "The second branch introduces " [:code "?speed"] " which only exists inside that branch, "
+   "so plain " [:code "or"] " would not work:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?e :pokemon/name ?name]
+    (or-join [?e]
+             [?e :pokemon/type "Electric"]
+             (and [?e :stat/speed ?speed]
+                  [(> ?speed 100)]))]]
+  [:p "The " [:code "[?e]"] " in " [:code "or-join"] " declares that " [:code "?e"] " is the only variable "
+   "that must unify with the outer query. "
+   [:code "?speed"] " is a local variable that lives only inside its branch."]
+  [:p [:strong "Try:"] " Add a third " [:code "or"] " branch for \"Electric\" in the first query. "
+   "Or modify the " [:code "or-join"] " query to find Pokemon that are Ground-type "
+   [:em "or"] " have attack above 120."]
+  [:p [:a {:href "/negation"} "Previous"] " | " [:a {:href "/cardinality-many"} "Next"]]]}
