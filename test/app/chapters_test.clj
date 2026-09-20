@@ -56,5 +56,5 @@
   (doseq [chapter (chapters/load-chapters)
           [dataset query] (runnables (:slug chapter))]
     (testing (str (:slug chapter) " " query)
-      (is (core/safe-q? query))
+      (is (core/safe-q? (edn/read-string query)))
       (is (some? (core/run-q dataset query))))))

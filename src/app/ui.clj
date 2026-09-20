@@ -26,16 +26,17 @@
       [:title title]
       [:meta {:charset "UTF-8"}]
       [:meta {:name :viewport :content "width=device-width, initial-scale=1"}]
-      [:meta {:description "This interactive website will help you learn how to query a Datomic databases using Datalog"}]
+      [:meta {:name "description" :content "This interactive website will help you learn how to query a Datomic databases using Datalog"}]
       [:link {:rel :preconnect :href "https://fonts.googleapis.com"}]
       [:link {:rel :preconnect :href "https://fonts.gstatic.com" :crossorigin true}]
       [:link {:rel :stylesheet :href "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"}]
-      [:link {:rel :stylesheet :href "https://cdn.jsdelivr.net/npm/@thiago.oak/code-highlighter@latest/prettylights.css"}]
+      [:link {:rel :stylesheet :href "https://cdn.jsdelivr.net/npm/@thiago.oak/code-highlighter@0.1.2/prettylights.css"
+              :integrity "sha384-0XLRNB4k2BlxMZsKhXHKFPlhutMYjhLKqMHLFS6Nd/CZQuTSVV6lUkZDujDj7R1t" :crossorigin "anonymous"}]
       [:link {:rel :stylesheet :href (str "/main.css?v=" version)}]]
      [:body
-       [:header {:style {:display "flex" :align-items "center" :justify-content "center" :margin-top "1em"}}
-        [:img {:src "/eav.svg" :class "logo" :width 50 :height 50 :style {:margin-right "10px"}}]
-        [:p {:style {:font-size "2em" :margin 0}} [:span {:style {:font-weight "bold"}} "try"] "datomic"]]
+       [:header
+         [:a {:href "/" :style {:display "flex" :align-items "center" :justify-content "center" :margin-top "1em" :text-decoration "none"}}[:img {:src "/eav.svg" :class "logo" :width 50 :height 50 :style {:margin-right "10px"}}]
+          [:p {:style {:font-size "2em" :margin 0}} [:span {:style {:font-weight "bold"}} "try"] "datomic"]]]
       [:div {:style {:display "flex"}} nav
       [:main children]]
       [:footer {:style {:text-align "center"}}
@@ -47,11 +48,16 @@
                 function gtag () {dataLayer.push (arguments);}
                 gtag ('js', new Date ());
                 gtag ('config', 'G-BMHSZQLLJ1');")]
-      [:script {:src "https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-core.min.js" :data-manual "data-manual"}]
-      [:script {:src "https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-clojure.min.js"}]
-      [:script {:src "https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-sql.min.js"}]
-      [:script {:type "module" :src "https://cdn.jsdelivr.net/npm/@thiago.oak/code-highlighter@latest/code-highlighter.js"}]
-      [:script {:type "module" :src "https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.3/bundles/datastar.js"}]]])))
+      [:script {:src "https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-core.min.js" :data-manual "data-manual"
+                :integrity "sha384-zLRFO4dwowZvh8kzutOb5AWhH7f39HeJp+N7PtHF1SQtTBnifRx0AtmvTYs3F4YV" :crossorigin "anonymous"}]
+      [:script {:src "https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-clojure.min.js"
+                :integrity "sha384-j1owyG3mnp/ZB3LSee5CQBYKR+GPh01okdNEbUUbvK5y+U+So0sw+2z2zpdPeQVX" :crossorigin "anonymous"}]
+      [:script {:src "https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-sql.min.js"
+                :integrity "sha384-/MKWdycCDliku23mP5sYXbZNuXrzgmQO/jsVxwPFn99dVOaXRyKsqDjarqpueGAp" :crossorigin "anonymous"}]
+      [:script {:type "module" :src "https://cdn.jsdelivr.net/npm/@thiago.oak/code-highlighter@0.1.2/code-highlighter.js"
+                :integrity "sha384-ZINuo7epnskJ88W6zqeL99sDcuODvwEJ7IN/K8juJMjXW0n1NQvZGzLDOvV1iaWE" :crossorigin "anonymous"}]
+      [:script {:type "module" :src "https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.3/bundles/datastar.js"
+                :integrity "sha384-yHqFPXJio1slWODLf67ZFfuDhhPUccOzGpGJF0d5fitjEfihEVrVvzMsfH8TxCiO" :crossorigin "anonymous"}]]])))
 
 (def runnable-counter (atom 0))
 
@@ -88,7 +94,7 @@
                  :class "button"}
         "Reset"]
 
-       [:button {"data-on:click__prevent" (str "@post('/api/q?dataset=" dataset "', {filterSignals: {include: /^" input-name "|" output-name "$/}})")
+       [:button {"data-on:click__prevent" (str "@post('/api/q?dataset=" dataset "&in=" input-name "&out=" output-name "', {filterSignals: {include: /^" input-name "$/}})")
                  :style {:margin "5px"}
                  :class "button run"}
         [:svg {:viewBox "0 0 12 12" :aria-hidden "true"}
