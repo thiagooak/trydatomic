@@ -16,8 +16,9 @@
                       :where
                       [?entity :pokemon/type "Grass"]
                       [?entity :pokemon/name ?name]])
-   [:p "Try editing the query above to return Pokemon of other types like Fire or Electric."]
-   [:p [:a {:href "/querying"} "Next"]]])
+   (app.ui/try-tip
+     [:p "Edit the query above to return Pokémon of other types like Fire or Electric."])
+   [:p [:a {:href "/querying" :class "button"} "Next Chapter →"]]])
 
 (defn two []
   [:div
@@ -246,7 +247,7 @@
     " defining all of the Pokemon in our database."]
    [:p "Run the last query with a dual-typed Pokemon like \"Charizard\" and observe "
     "how many attribute-value rows appear — one for each fact stored about that entity."]
-   [:p [:a {:href "/"} "Previous"] " | " [:a {:href "/predicates"} "Next"]]])
+   [:p [:a {:href "/" :class "button"} "← Previous Chapter"] " | " [:a {:href "/predicates"} "Next"]]])
 
 (defn four []
   [:div

@@ -1,5 +1,24 @@
 :root {
     color-scheme: light dark;
+
+    --ink: #000;
+    --paper: #fff;
+
+    --run: #00933c;
+    --run-ink: #fff;
+
+    --try: #fccc0a;
+    --try-ink: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #f4f4f4;
+    --paper: #0d0d0d;
+
+    --run: #1fb35a;
+    --run-ink: #000;
+  }
 }
 
 html {
@@ -73,9 +92,13 @@ code-highlighter {
 .output {
     border: none;
     width: 100%;
-    padding: 5px;
-    margin-top: 3px;
+    padding: 12px 15px;
     text-wrap: wrap;
+}
+
+.output {
+    overflow-y: auto;
+    max-height: 200px;
 }
 
 @media (max-width: 800px) {
@@ -86,4 +109,42 @@ code-highlighter {
   nav {
     display: none;
   }
+}
+
+.button {
+    appearance: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.8em;
+    padding: 11px 18px;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+}
+
+.button.run {
+    background: var(--run);
+    border-color: var(--run);
+    color: var(--run-ink);
+}
+
+.button svg {
+    width: 0.75em;
+    height: 0.75em;
+    fill: currentColor;
+}
+
+.try {
+    flex-direction: column;
+    max-width: 80%;
+    background: var(--try);
+    color: var(--try-ink);
+    padding: 14px 18px;
+    margin: 0 0 1.4em;
+    display: flex;
+    align-items: baseline;
 }
