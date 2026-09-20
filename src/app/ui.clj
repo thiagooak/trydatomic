@@ -12,9 +12,6 @@
 (defn chapter-href [{:keys [slug]}]
   (if (= slug "index") "/" (str "/" slug)))
 
-(defn nav-li [{:keys [nav-title] :as chapter}]
-  [:li [:a {:href (chapter-href chapter) :style {:color "var(--ink)"}} nav-title]])
-
 (defn pager
   "Previous and next chapter buttons. Either chapter may be nil."
   [previous following]
@@ -24,9 +21,31 @@
    (when following
      [:a {:href (chapter-href following) :rel "next" :class "button next"} "Next →"])])
 
-(defn nav [chapters]
-  [:nav [:ul
-         (map nav-li chapters)]])
+(defn- chapter-list [chapters current-slug]
+  [:ul {:class "chapter-list"}
+   (map-indexed
+    (fn [i {:keys [slug nav-title] :as chapter}]
+      [:li [:a (cond-> {:href (chapter-href chapter)}
+                 (= slug current-slug) (assoc :aria-current "page"))
+            [:span {:class "num"} i]
+            nav-title]])
+    chapters)])
+
+(defn nav
+  "The chapter list: a sticky sidebar on wide screens and a Chapters menu on
+  narrow ones (main.css shows one and hides the other). `current-slug` marks the
+  chapter being read, and may be nil."
+  [chapters current-slug]
+  (list
+   [:nav {:class "chapters" :aria-label "Chapters"}
+    [:p {:class "nav-label"} "Chapters"]
+    (chapter-list chapters current-slug)]
+   [:details {:class "chapters-menu"}
+    [:summary {:class "button"}
+     "Chapters"
+     [:svg {:viewBox "0 0 12 12" :aria-hidden "true"}
+      [:path {:d "M2 4l4 4 4-4" :fill "none" :stroke "currentColor" :stroke-width "2"}]]]
+    (chapter-list chapters current-slug)]))
 
 (defn page [title nav children]
   (str
@@ -49,7 +68,7 @@
        [:header
          [:a {:href "/" :style {:display "flex" :align-items "center" :justify-content "center" :margin-top "1em" :text-decoration "none" :color "var(--ink)"}}[:img {:src "/eav.svg" :class "logo" :width 50 :height 50 :style {:margin-right "10px"}}]
           [:p {:style {:font-size "2em" :margin 0}} [:span {:style {:font-weight "bold"}} "try"] "datomic"]]]
-      [:div {:style {:display "flex"}} nav
+      [:div {:class "layout"} nav
       [:main children]]
       [:footer {:style {:text-align "center"}}
        "This website is not associated with Nubank or Datomic"

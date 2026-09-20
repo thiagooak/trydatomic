@@ -29,7 +29,7 @@
     (testing slug
       (let [chapter (chapters/load-chapter slug)]
         (is (:nav-title chapter))
-        (is (string? (ui/page "t" (ui/nav [chapter]) (:content chapter))))))))
+        (is (string? (ui/page "t" (ui/nav [chapter] slug) (:content chapter))))))))
 
 (deftest unknown-component-fails-loudly
   (is (thrown-with-msg? Exception #"Unknown component :ui/nope in chapter x"
@@ -57,6 +57,18 @@
            (html (ui/pager nil b))))
     (is (= "<div class=\"pager\"><a class=\"button\" href=\"/\" rel=\"prev\">← Previous</a></div>"
            (html (ui/pager a nil))))))
+
+(deftest nav-marks-the-current-chapter
+  (let [loaded (chapters/load-chapters)
+        html #(str (h/html {:mode :html} (ui/nav loaded %)))]
+    (testing "one current chapter in the sidebar and one in the phone menu"
+      (is (= 2 (count (re-seq #"aria-current" (html "negation")))))
+      (is (re-find #"<a aria-current=\"page\" href=\"/negation\"><span class=\"num\">3</span>Negation</a>"
+                   (html "negation"))))
+    (testing "no current chapter, for example on the 404 page"
+      (is (nil? (re-find #"aria-current" (html nil)))))
+    (testing "chapters are numbered from 0 and Index links to /"
+      (is (re-find #"<a href=\"/\"><span class=\"num\">0</span>Index</a>" (html "negation"))))))
 
 (deftest chapters-do-not-hardcode-navigation-links
   (doseq [slug (all-slugs)

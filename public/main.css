@@ -3,6 +3,7 @@
 
     --ink: #000;
     --paper: #fff;
+    --muted: #6b6b6b;
 
     --run: #00933c;
     --run-ink: #fff;
@@ -15,6 +16,7 @@
   :root {
     --ink: #f4f4f4;
     --paper: #0d0d0d;
+    --muted: #8a8a8a;
 
     --run: #1fb35a;
     --run-ink: #000;
@@ -50,17 +52,96 @@ body {
     }
 }
 
+.layout {
+    display: flex;
+}
+
 nav {
-    flex: 1;
+    flex: 0 0 13.5em;
     margin-top: 5em;
+    margin-right: 1em;
+    position: sticky;
+    top: 1em;
+    align-self: flex-start;
+    max-height: calc(100vh - 2em);
+    overflow-y: auto;
 }
 
-nav ul {
+.nav-label {
+    margin: 0 0 10px 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.chapter-list {
     padding-left: 0;
+    margin: 0;
 }
 
-nav li {
+.chapter-list li {
     list-style-type: none;
+}
+
+.chapter-list a {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 2px 0;
+    padding: 5px 12px;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.chapter-list a:hover,
+.chapter-list a:focus-visible {
+    border-color: var(--ink);
+}
+
+.chapter-list a[aria-current="page"] {
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 700;
+}
+
+.chapter-list .num {
+    min-width: 1.2em;
+    font-size: 0.75em;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+}
+
+.chapter-list a[aria-current="page"] .num {
+    color: inherit;
+}
+
+.chapters-menu {
+    display: none;
+    margin: 1em 0;
+}
+
+.chapters-menu summary {
+    list-style: none;
+}
+
+.chapters-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.chapters-menu[open] summary svg {
+    transform: rotate(180deg);
+}
+
+.chapters-menu .chapter-list {
+    margin-top: 8px;
+    padding: 8px 6px;
+    border: 2px solid var(--ink);
+    border-radius: 14px;
 }
 
 main {
@@ -106,8 +187,16 @@ code-highlighter {
     display: block;
   }
 
+  .layout {
+    display: block;
+  }
+
   nav {
     display: none;
+  }
+
+  .chapters-menu {
+    display: block;
   }
 }
 

@@ -112,7 +112,7 @@
      :headers {"Content-Type" "text/html"}
      :body (app.ui/page
             "Learn Datomic Datalog"
-            (app.ui/nav chapters)
+            (app.ui/nav chapters (when chapter slug))
             (if chapter
               (list (:content chapter)
                     (apply app.ui/pager (app.chapters/neighbours chapters slug)))
