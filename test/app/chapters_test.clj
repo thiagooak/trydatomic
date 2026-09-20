@@ -39,15 +39,15 @@
   (let [loaded (chapters/load-chapters)]
     (is (= "querying" (:slug (chapters/find-chapter loaded "querying"))))
     (is (nil? (chapters/find-chapter loaded "../../etc/passwd")))
-    (is (nil? (chapters/find-chapter loaded "modeling-data")))))
+    (is (nil? (chapters/find-chapter loaded "no-such-chapter")))))
 
 (deftest neighbours-follow-the-manifest-order
   (let [loaded (chapters/load-chapters)
         slugs (mapv :slug loaded)]
-    (is (= [nil "querying"] (map :slug (chapters/neighbours loaded (first slugs)))))
-    (is (= ["predicates" "or-clauses"] (map :slug (chapters/neighbours loaded "negation"))))
+    (is (= [nil (second slugs)] (map :slug (chapters/neighbours loaded (first slugs)))))
+    (is (= [(nth slugs 1) (nth slugs 3)] (map :slug (chapters/neighbours loaded (nth slugs 2)))))
     (is (= [(last (butlast slugs)) nil] (let [[p n] (chapters/neighbours loaded (last slugs))] [(:slug p) (:slug n)])))
-    (is (nil? (chapters/neighbours loaded "modeling-data")))))
+    (is (nil? (chapters/neighbours loaded "no-such-chapter")))))
 
 (deftest pager-renders-buttons-for-the-neighbours-that-exist
   (let [html #(str (h/html {:mode :html} %))
@@ -60,10 +60,12 @@
 
 (deftest nav-marks-the-current-chapter
   (let [loaded (chapters/load-chapters)
+        number (.indexOf ^java.util.List (mapv :slug loaded) "negation")
         html #(str (h/html {:mode :html} (ui/nav loaded %)))]
     (testing "one current chapter in the sidebar and one in the phone menu"
       (is (= 2 (count (re-seq #"aria-current" (html "negation")))))
-      (is (re-find #"<a aria-current=\"page\" href=\"/negation\"><span class=\"num\">3</span>Negation</a>"
+      (is (re-find (re-pattern (str "<a aria-current=\"page\" href=\"/negation\"><span class=\"num\">"
+                                    number "</span>Negation</a>"))
                    (html "negation"))))
     (testing "no current chapter, for example on the 404 page"
       (is (nil? (re-find #"aria-current" (html nil)))))

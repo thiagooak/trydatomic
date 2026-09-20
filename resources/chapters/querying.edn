@@ -2,7 +2,8 @@
  :content
  [:div
   [:h1 "Querying Basics"]
-  [:p "Before we continue, let's take a closer look at the data model powering our Pokemon database."]
+  [:p "In the previous chapter we saw how Datomic stores facts. "
+   "Now let's look at how they appear in our Pokemon database, and start querying them."]
   [:p "Each Pokemon is stored as an " [:strong "Entity"] ". Here is what Bulbasaur looks like:"]
   [:ui/code
    {:pokemon/name    "Bulbasaur",

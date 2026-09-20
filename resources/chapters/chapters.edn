@@ -1,5 +1,5 @@
 ["index"
- ;; "modeling-data"
+ "modeling-data"
  "querying"
  "predicates"
  "negation"
@@ -7,7 +7,7 @@
  "cardinality-many"
  "aggregations"
  "find-specs"
- ;; "input-params"
- ;; "pull"
- ;; "rules"
+ "input-params"
+ "pull"
+ "rules"
  ]

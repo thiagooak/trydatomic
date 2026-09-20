@@ -109,7 +109,8 @@ nav {
 }
 
 .chapter-list .num {
-    min-width: 1.2em;
+    min-width: 1.6em;
+    text-align: right;
     font-size: 0.75em;
     font-weight: 400;
     font-variant-numeric: tabular-nums;
