@@ -63,18 +63,43 @@
   [:h2 "Tuple — single row"]
   [:p "Wrap multiple variables in " [:code "[?a ?b]"] " (no " [:code "..."] ") "
    "to return exactly one tuple. "
-   "Like the scalar form, it is most reliable when the query is guaranteed to match one row — "
-   "for example, a lookup by a unique attribute:"]
+   "If the query matches several rows, you get one of them and Datomic does not tell you the others existed, "
+   "so the query has to be guaranteed to match one row. That takes two things: "
+   "the lookup goes through a " [:strong "unique attribute"] ", and every other attribute it joins "
+   "is " [:strong "cardinality one"] ". "
+   "In this database " [:code ":pokemon/number"] " is declared " [:code ":db.unique/identity"] ", "
+   "and " [:code ":pokemon/name"] ", " [:code ":stat/hp"] " and " [:code ":stat/speed"] " each hold one value per Pokemon:"]
+  [:ui/runnable "pokemon"
+   [:find [?name ?hp ?speed]
+    :where
+    [?e :pokemon/number "025"]
+    [?e :pokemon/name ?name]
+    [?e :stat/hp ?hp]
+    [?e :stat/speed ?speed]]]
+  [:p "The result is a plain vector " [:code "[\"Pikachu\" 35 90]"] " "
+   "rather than a collection of tuples, easy to destructure directly in Clojure. "
+   "Any number that exists in the database gives exactly one row."]
+
+  [:h3 "What could go wrong"]
+  [:p "Break either condition and the tuple spec stops being safe. "
+   "This query looks the Pokemon up by " [:code ":pokemon/name"] ", which the schema does not make unique, "
+   "and it joins " [:code ":pokemon/type"] ", which is cardinality many. "
+   "Bulbasaur is Grass and Poison, so "
+   [:ui/value "pokemon" [:find (count ?type) . :where [?e :pokemon/name "Bulbasaur"] [?e :pokemon/type ?type]]]
+   " rows match. Before you run it, predict what the tuple spec returns:"]
   [:ui/runnable "pokemon"
    [:find [?number ?type ?speed]
     :where
-    [?e :pokemon/name "Pikachu"]
+    [?e :pokemon/name "Bulbasaur"]
     [?e :pokemon/number ?number]
     [?e :pokemon/type ?type]
     [?e :stat/speed ?speed]]]
-  [:p "Pikachu has exactly one entry in the database so this is safe. "
-   "The result is a plain vector " [:code "[\"025\" \"Electric\" 90]"] " "
-   "rather than a collection of tuples — easy to destructure directly in Clojure."]
+  [:p "You get a single tuple with one of the two types. There is no error and no warning, "
+   "and the other type is gone. Swap in \"Pikachu\" and the same query looks fine, "
+   "but only because Pikachu happens to have one type."]
+  [:p "When you want one entity with everything it has, use " [:code "pull"] " with the scalar find spec instead. "
+   "The Pull chapter covers it: a cardinality-many attribute comes back as a collection holding every value."]
   [:ui/try-tip
-   [:p "Use the tuple find spec to look up a different Pokemon — try \"Mewtwo\" or \"Snorlax\". "
+   [:p "Look up other Pokemon by number in the safe query, such as \"150\" or \"143\". "
+    "Then change the name in the Bulbasaur query to \"Charizard\" or \"Pikachu\" and predict the result each time. "
     "Or combine the scalar spec with " [:code "(min ?speed)"] " to return just the single lowest speed value in the Pokedex."]]]}

@@ -52,9 +52,20 @@
   (testing "scalar"
     (is (= 150 (run-q "pokemon" "[:find (max ?speed) . :where [?e :stat/speed ?speed]]"))))
 
-  (testing "tuple"
-    (is (= ["025" "Electric" 90]
-           (run-q "pokemon" "[:find [?number ?type ?speed] :where [?e :pokemon/name \"Pikachu\"] [?e :pokemon/number ?number] [?e :pokemon/type ?type] [?e :stat/speed ?speed]]"))))
+  (testing "tuple, unique lookup over cardinality-one attributes"
+    (let [q "[:find [?name ?hp ?speed] :where [?e :pokemon/number \"%s\"] [?e :pokemon/name ?name] [?e :stat/hp ?hp] [?e :stat/speed ?speed]]"]
+      (is (= ["Pikachu" 35 90] (run-q "pokemon" (format q "025"))))
+      (is (= ["Mewtwo" 106 130] (run-q "pokemon" (format q "150"))))
+      (is (= ["Snorlax" 160 30] (run-q "pokemon" (format q "143"))))))
+
+  (testing "tuple over a cardinality-many attribute silently drops rows"
+    (let [q "[:find [?number ?type ?speed] :where [?e :pokemon/name \"%s\"] [?e :pokemon/number ?number] [?e :pokemon/type ?type] [?e :stat/speed ?speed]]"
+          [number type speed :as result] (run-q "pokemon" (format q "Bulbasaur"))]
+      (is (= 2 (run-q "pokemon" "[:find (count ?type) . :where [?e :pokemon/name \"Bulbasaur\"] [?e :pokemon/type ?type]]")))
+      (is (= 3 (count result)))
+      (is (= ["001" 45] [number speed]))
+      (is (contains? #{"Grass" "Poison"} type))
+      (is (= ["025" "Electric" 90] (run-q "pokemon" (format q "Pikachu"))))))
 
   (testing "scalar pull"
     (is (= {:pokemon/name "Pikachu" :stat/speed 90}
