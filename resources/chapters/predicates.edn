@@ -47,7 +47,7 @@
    ". Datomic answers them with an index instead of checking every value, "
    "so they are much more efficient than the same test written with another function. "
    "Datomic's own "
-   [:a {:href "https://docs.datomic.com/query/query-data-reference.html#built-in-predicates-and-functions"} "built-in functions"]
+   [:a {:href "https://docs.datomic.com/query/query-data-reference.html#built-in-functions"} "built-in functions"]
    " are also cheaper than your own, since they run inside the query engine. "
    "Our database is too small to notice, but this matters in a real one. "
    "Strings sort in dictionary order, so the names starting with \"S\" are also the names from \"S\" up to, "
