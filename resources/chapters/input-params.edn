@@ -5,8 +5,10 @@
   [:p "Every query so far has had its filter values written directly into the query. "
    "The " [:code ":in"] " clause lets you declare named inputs, so the same query "
    "can be run with different values, exactly like function parameters."]
-  [:p "The database itself is always the first input, conventionally named " [:code "$"] ". "
-   "The site passes it for you. Any additional inputs follow, in the same order as in " [:code ":in"] ". "
+  [:p "Every one of those earlier queries actually had an implicit " [:code ":in $"] ": the database itself, "
+   "conventionally named " [:code "$"] ". When you write " [:code ":in"] " yourself, you list " [:code "$"]
+   " explicitly, followed by your own inputs, in the same order the query expects them. "
+   "The site passes " [:code "$"] " for you either way. "
    "In Clojure you would call a query with one extra input like this:"]
   [:ui/code "clojure"
    "(d/q '[:find ?name
