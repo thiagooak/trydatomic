@@ -8,9 +8,10 @@
    "They keep complex queries readable and make shared logic easy to compose."]
 
   [:h2 "Defining and using a rule"]
-  [:p "A rule is a vector of " [:em "rule heads"] ". "
-   "Each head is itself a vector whose first element is the rule name and parameter list, "
-   "followed by the body clauses. Rules are passed to the query as an input, "
+  [:p "A rule is a collection of " [:em "definitions"] ". "
+   "Each definition is a vector whose first element is the " [:em "head"]
+   " — the rule name and its parameters, like " [:code "(strong? ?e)"]
+   " — followed by the " [:em "body"] ": the clauses that must match. Rules are passed to the query as an input, "
    "using the special " [:code "%"] " binding, and invoked in " [:code ":where"] " like any other clause. "
    "In Clojure that looks like this:"]
   [:ui/code "clojure"
@@ -42,10 +43,10 @@
   [:p "Rules become especially valuable when the same set of clauses is needed "
    "in multiple queries, or when you want to give a complex condition a meaningful name."]
 
-  [:h2 "Multiple heads: rule-level OR"]
-  [:p "A rule name can have more than one head. "
-   "Datomic treats multiple heads as a " [:em "disjunction"] ": "
-   "the rule succeeds if " [:em "any"] " head's body matches. "
+  [:h2 "Multiple definitions: rule-level OR"]
+  [:p "A rule name can have more than one definition — sometimes called branches. "
+   "Datomic treats them as a " [:em "disjunction"] ": "
+   "the rule succeeds if " [:em "any"] " definition's body matches. "
    "This gives you named OR logic without repeating " [:code "or-join"] " everywhere:"]
   [:ui/runnable "pokemon"
    [:find ?name
@@ -66,7 +67,7 @@
    "The canonical example is reachability in a graph."]
   [:p "In our data, " [:code ":evolution/next"] " links each Pokemon to the ones it evolves into. "
    "A recursive rule can follow those links as far as they go. "
-   "The first head is the base case, a direct evolution. "
+   "The first definition is the base case, a direct evolution. "
    "The second says that a Pokemon also evolves into whatever its evolution evolves into:"]
   [:ui/runnable "pokemon"
    [:find ?name
@@ -81,12 +82,15 @@
      [?a :evolution/next ?b]
      (evolves-into? ?b ?c)]]]
   [:p "Ivysaur is a direct evolution, and Venusaur is reached through Ivysaur."]
-  [:p "One important constraint: every recursive rule must have a " [:em "base case"] " "
-   "(a non-recursive head) that eventually terminates the recursion. "
-   "Datomic stops when a full pass through all rule heads derives no new results."]
+  [:p "One important role: a recursive rule needs a non-recursive definition — a " [:em "base case"]
+   " — to produce any results at all. A rule with only a recursive definition has nothing to "
+   "recurse from, so it derives nothing. Termination isn't the base case's job: Datomic evaluates "
+   "rules to a fixpoint regardless of shape, even one that cycles back on itself, stopping once a "
+   "full pass through all definitions derives no new results."]
 
   [:h2 "Rules run in both directions"]
-  [:p "A rule doesn't say which side is the input. "
+  [:p "By default, a rule doesn't say which side is the input — though Datomic lets you declare "
+   "required bindings on a rule if you want to enforce one. "
    "The same " [:code "evolves-into?"] " rule can start from the descendant and find its ancestors:"]
   [:ui/runnable "pokemon"
    [:find ?name
