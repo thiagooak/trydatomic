@@ -18,8 +18,23 @@
                              :db/valueType :db.type/ref
                              :db/cardinality :db.cardinality/many}]})"]
   [:p "A type is strong against several others, so the cardinality is many. "
+   [:code ":db/unique :db.unique/identity"] " makes " [:code ":type/name"] " the type's natural key: "
+   "at most one type entity can have a given name, and Datomic enforces it. "
    "The database also has " [:code ":type/weak-against"] " (half damage) and "
    [:code ":type/no-effect-on"] " (no damage)."]
+
+  [:h2 "Asserting a reference with a lookup ref"]
+  [:p "A unique attribute like " [:code ":type/name"] " lets you identify an entity without knowing its "
+   "entity id — with a " [:strong "lookup ref"] ", a two-element vector like "
+   [:code "[:type/name \"Fire\"]"] " that stands in for whichever entity has that value."]
+  [:p "Lookup refs let you connect two entities in one transaction, using only values you already know. "
+   "This adds a new strength for Water without looking up any ids:"]
+  [:ui/code "clojure"
+   "(d/transact conn {:tx-data [{:db/id [:type/name \"Water\"]
+                            :type/strong-against [:type/name \"Fire\"]}]})"]
+  [:p "Entity ids are assigned by Datomic and can differ between databases, so code shouldn't store them "
+   "outside it. A unique attribute is stable, and a lookup ref lets you use it anywhere an entity id is "
+   "expected — including as the value of a reference attribute, as here."]
 
   [:h2 "Following a reference"]
   [:p "The value of a reference attribute is an entity id. "

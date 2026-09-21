@@ -18,7 +18,9 @@
   [:p "Each key is an " [:strong "Attribute"] " (:pokemon/name, :stat/speed, etc"
    ") and each value is the " [:strong "Value"] " for that attribute on this entity (Bulbasaur, 45, etc)."]
   [:p "Datomic assigns every entity a unique " [:strong "entity ID"] " when it is first added. "
-   "You never choose it. "
+   "You never choose it — and because of that, code shouldn't store an entity id outside Datomic. "
+   "The " [:a {:href "/relationships"} "Relationships"] " chapter shows how to identify an entity a "
+   "different way, with a unique attribute instead. "
    "(See " [:a {:href "https://docs.datomic.com/whatis/data-model.html"} "the Datomic data model"] ".) "
    "Let's find Bulbasaur's:"]
   [:ui/runnable "pokemon"
