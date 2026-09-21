@@ -102,10 +102,37 @@
      (evolves-into? ?b ?c)]]]
 
   [:h2 "Rules over relationships"]
-  [:p "In the " [:a {:href "/relationships"} "Relationships"] " chapter we found the Pokemon that hit Gengar "
-   "super-effectively with a join across three kinds of links. "
-   "A rule can put a name on that whole join, taking an attacker and a defender. "
-   "Then the query reads like a sentence:"]
+  [:p "In the " [:a {:href "/relationships"} "Relationships"] " chapter we built a query to find the Pokemon "
+   "that hit Gengar super-effectively. Here it is again, all seven clauses of it:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?gengar :pokemon/name "Gengar"]
+    [?gengar :pokemon/type ?defending-name]
+    [?defending :type/name ?defending-name]
+    [?attacking :type/strong-against ?defending]
+    [?attacking :type/name ?attacking-name]
+    [?e :pokemon/type ?attacking-name]
+    [?e :pokemon/name ?name]]]
+  [:p "The three clauses in the middle say one thing: a type is strong against another. "
+   "A rule can give them a name. " [:code "type-beats?"] " takes two type names, and the rule finds the entities. "
+   "The query is shorter and returns the same Pokemon:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :in $ %
+    :where
+    [?gengar :pokemon/name "Gengar"]
+    [?gengar :pokemon/type ?defending-name]
+    (type-beats? ?attacking-name ?defending-name)
+    [?e :pokemon/type ?attacking-name]
+    [?e :pokemon/name ?name]]
+   [[(type-beats? ?attacking-name ?defending-name)
+     [?defending :type/name ?defending-name]
+     [?attacking :type/strong-against ?defending]
+     [?attacking :type/name ?attacking-name]]]]
+  [:p "A rule can use other rules. " [:code "super-effective?"] " takes an attacker and a defender, both Pokemon, "
+   "and asks " [:code "type-beats?"] " about their types. "
+   "Now the query reads like a sentence:"]
   [:ui/runnable "pokemon"
    [:find ?name
     :in $ %
@@ -113,12 +140,14 @@
     [?gengar :pokemon/name "Gengar"]
     (super-effective? ?e ?gengar)
     [?e :pokemon/name ?name]]
-   [[(super-effective? ?attacker ?defender)
+   [[(type-beats? ?attacking-name ?defending-name)
+     [?defending :type/name ?defending-name]
+     [?attacking :type/strong-against ?defending]
+     [?attacking :type/name ?attacking-name]]
+    [(super-effective? ?attacker ?defender)
      [?attacker :pokemon/type ?attacking-name]
      [?defender :pokemon/type ?defending-name]
-     [?attacking :type/name ?attacking-name]
-     [?defending :type/name ?defending-name]
-     [?attacking :type/strong-against ?defending]]]]
+     (type-beats? ?attacking-name ?defending-name)]]]
   [:p "A rule is an ordinary clause, so it combines with the others, including negation. "
    "Gengar is Ghost and Poison. Which of the Pokemon that beat it are not Poison type?"]
   [:ui/runnable "pokemon"
@@ -129,12 +158,14 @@
     (super-effective? ?e ?gengar)
     (not [?e :pokemon/type "Poison"])
     [?e :pokemon/name ?name]]
-   [[(super-effective? ?attacker ?defender)
+   [[(type-beats? ?attacking-name ?defending-name)
+     [?defending :type/name ?defending-name]
+     [?attacking :type/strong-against ?defending]
+     [?attacking :type/name ?attacking-name]]
+    [(super-effective? ?attacker ?defender)
      [?attacker :pokemon/type ?attacking-name]
      [?defender :pokemon/type ?defending-name]
-     [?attacking :type/name ?attacking-name]
-     [?defending :type/name ?defending-name]
-     [?attacking :type/strong-against ?defending]]]]
+     (type-beats? ?attacking-name ?defending-name)]]]
 
   [:h2 "Rules with function clauses"]
   [:p "The body of a rule can hold any clause, including the "
@@ -162,5 +193,7 @@
 
   [:ui/try-tip
    [:p "Change " [:code "\"Bulbasaur\""] " to " [:code "\"Eevee\""] " in the recursive query to see it branch. "
+    "Or swap the two arguments of " [:code "super-effective?"] " in the first Gengar query above, "
+    "to ask which Pokemon Gengar hits super-effectively. "
     "Or edit the " [:code "strong?"] " rule to require both attack > 90 "
     [:em "and"] " speed > 90, and see how many Pokemon meet both criteria."]]]}

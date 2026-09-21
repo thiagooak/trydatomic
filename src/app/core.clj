@@ -90,7 +90,8 @@
   (ex-info message {::user-error true}))
 
 (defn- read-forms
-  "The query and its inputs: the EDN forms in `q`, in order."
+  "The query and its inputs: the EDN forms in `q`, in order. None when the text
+  is empty or only comments."
   [q]
   (when-not (string? q) (throw (user-error "The query must be text")))
   (when (> (count q) max-query-length)
@@ -102,7 +103,6 @@
                                          (repeatedly #(edn/read {:eof ::eof} reader))))))
                 (catch RuntimeException e
                   (throw (user-error (str "Could not read the query: " (ex-message e))))))]
-    (when (empty? forms) (throw (user-error "The query is empty")))
     (when (> (count forms) max-forms)
       (throw (user-error (str "Too many inputs (the limit is " (dec max-forms) ")"))))
     forms))
@@ -144,24 +144,28 @@
         :history (d/history db)))
     input))
 
-(defn run-q [dataset q]
-  (let [[query & inputs] (read-forms q)
+(defn run-q
+  "The result of running the query in `q`, or nil when `q` has nothing in it,
+  like a REPL with nothing to evaluate."
+  [dataset q]
+  (let [[query & inputs :as forms] (read-forms q)
         inputs (mapv #(or (db-view %) %) inputs)]
-    (when-let [sym (apply unsafe-symbol query (remove #(instance? DbView %) inputs))]
-      (throw (user-error (str "Unsafe Query: " sym " is not allowed"))))
-    (let [db (app.db/db-value dataset)
-          {:keys [query shape]} (app.find-spec/normalize query)]
-      (try
-        ;; :timeout is not enforced by Datomic Local, and :limit only trims the result.
-        (shape (d/q {:query query
-                     :timeout 500
-                     :limit max-results
-                     :args (into [db] (map #(resolve-input db %) inputs))}))
-        ;; A query that matches every row against every other row (clauses that
-        ;; share no variable) can use more memory than we have. The query's
-        ;; data is garbage by now, so the server carries on.
-        (catch OutOfMemoryError _
-          (throw (user-error "That query needs too much memory. Check that its clauses share variables, otherwise every row is combined with every other row.")))))))
+    (when (seq forms)
+      (when-let [sym (apply unsafe-symbol query (remove #(instance? DbView %) inputs))]
+        (throw (user-error (str "Unsafe Query: " sym " is not allowed"))))
+      (let [db (app.db/db-value dataset)
+            {:keys [query shape]} (app.find-spec/normalize query)]
+        (try
+          ;; :timeout is not enforced by Datomic Local, and :limit only trims the result.
+          (shape (d/q {:query query
+                       :timeout 500
+                       :limit max-results
+                       :args (into [db] (map #(resolve-input db %) inputs))}))
+          ;; A query that matches every row against every other row (clauses that
+          ;; share no variable) can use more memory than we have. The query's
+          ;; data is garbage by now, so the server carries on.
+          (catch OutOfMemoryError _
+            (throw (user-error "That query needs too much memory. Check that its clauses share variables, otherwise every row is combined with every other row."))))))))
 
 (defn- error-message
   "Datomic's own error messages help people fix their query. Anything else is

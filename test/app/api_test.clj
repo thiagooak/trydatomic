@@ -101,8 +101,9 @@
   (testing "too many forms"
     (is (thrown-with-msg? Exception #"Too many inputs"
                           (run-q "pokemon" "[:find ?x :in $ ?a ?b ?c ?d :where [?x :pokemon/name _]] 1 2 3 4"))))
-  (testing "empty text"
-    (is (thrown-with-msg? Exception #"empty" (run-q "pokemon" "  ;; nothing here")))))
+  (testing "empty text is nil, like a REPL with nothing to evaluate"
+    (is (nil? (run-q "pokemon" "")))
+    (is (nil? (run-q "pokemon" "  ;; nothing here")))))
 
 (def strong-rules '[[(strong? ?e) [?e :stat/attack ?a] [?e :stat/speed ?s] [(> ?a 80)] [(> ?s 80)]]])
 

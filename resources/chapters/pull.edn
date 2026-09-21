@@ -67,17 +67,38 @@
 
   [:h2 "Attribute options"]
   [:p "Wrap an attribute in a list to give it options. "
-   [:code ":as"] " renames the key in the result, "
-   [:code ":limit"] " caps how many values a cardinality-many attribute returns, "
-   "and " [:code ":default"] " supplies a value when the entity doesn't have the attribute at all:"]
+   "The first is " [:code ":as"] ", which renames the key in the result:"]
+  [:ui/runnable "pokemon"
+   [:find (pull ?e [(:pokemon/name :as "name")
+                    :stat/speed])
+    :where
+    [?e :pokemon/name "Bulbasaur"]]]
+  [:p [:code ":limit"] " caps how many values a cardinality-many attribute returns. "
+   "Bulbasaur has two types, but this returns only one of them:"]
+  [:ui/runnable "pokemon"
+   [:find (pull ?e [:pokemon/name
+                    (:pokemon/type :limit 1)])
+    :where
+    [?e :pokemon/name "Bulbasaur"]]]
+  [:p [:code ":default"] " supplies a value when the entity doesn't have the attribute at all. "
+   "Bulbasaur has no " [:code ":pokemon/category"] ", so we get the default. "
+   "Without one, the key would be left out of the map:"]
+  [:ui/runnable "pokemon"
+   [:find (pull ?e [:pokemon/name
+                    (:pokemon/category :default :none)])
+    :where
+    [?e :pokemon/name "Bulbasaur"]]]
+  [:p "Options can be combined in one pattern, each on its own attribute:"]
   [:ui/runnable "pokemon"
    [:find (pull ?e [(:pokemon/name :as "name")
                     (:pokemon/type :limit 1)
                     (:pokemon/category :default :none)])
     :where
     [?e :pokemon/name "Bulbasaur"]]]
-  [:p "Bulbasaur has two types, but " [:code ":limit 1"] " returns only one of them, and it has no "
-   [:code ":pokemon/category"] ", so the default is used."]
+  [:p "Your turn. Pull Pikachu's name under the key " [:code "\"name\""] ", and its "
+   [:code ":evolution/next"] " with a default of " [:code ":none"] ". "
+   "Then try the same for Raichu."]
+  [:ui/runnable "pokemon"]
 
   [:h2 "Following references"]
   [:p [:code ":evolution/next"] " is a reference: its value is another entity. "

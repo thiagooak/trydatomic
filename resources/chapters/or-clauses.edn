@@ -16,19 +16,6 @@
     (or [?e :pokemon/type "Fire"]
         [?e :pokemon/type "Water"])]]
   [:p "Try adding a third branch for \"Electric\"."]
-  [:p "You can also use " [:code "or"] " to match against multiple values of the same attribute — "
-   "here we find pure Fire-type or pure Water-type Pokemon by adding a second clause "
-   "that rules out dual types:"]
-  [:ui/runnable "pokemon"
-   [:find ?name ?type
-    :where
-    [?e :pokemon/name ?name]
-    [?e :pokemon/type ?type]
-    (or [?e :pokemon/type "Fire"]
-        [?e :pokemon/type "Water"])
-    (not-join [?e ?type]
-              [?e :pokemon/type ?other]
-              [(not= ?type ?other)])]]
 
   [:h2 "or-join"]
   [:p [:code "or-join"] " works like " [:code "or"] " but you declare explicitly which outer variables "

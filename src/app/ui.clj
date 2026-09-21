@@ -204,18 +204,23 @@
 
 (defn editor-text
   "The text in a runnable's editor: the query, then any inputs in the order of
-  :in (after $). The server reads it back as the query followed by its inputs."
-  [query & inputs]
-  (str (format-query query)
-       (when (seq inputs)
-         (str "\n;; inputs, in the order of :in (after $)\n"
-              (apply str (map #(str (str/join "\n" (hang % line-width)) "\n") inputs))))))
+  :in (after $). The server reads it back as the query followed by its inputs.
+  With no query the editor is empty."
+  ([] "")
+  ([query & inputs]
+   (str (format-query query)
+        (when (seq inputs)
+          (str "\n;; inputs, in the order of :in (after $)\n"
+               (apply str (map #(str (str/join "\n" (hang % line-width)) "\n") inputs)))))))
 
-(defn runnable [dataset query & inputs]
+(defn runnable
+  "An editor with a Run button. `forms` are the query and its inputs, none for
+  an empty editor to write in."
+  [dataset & forms]
   (let [random-name (swap! runnable-counter inc)
         input-name (str "in" random-name)
         output-name (str "out" random-name)
-        input-text (apply editor-text query inputs)]
+        input-text (apply editor-text forms)]
 
     [:div {(str "data-signals:" input-name) (json/write-str input-text :escape-slash false :escape-unicode false)
            (str "data-signals:" output-name) "',,,'"

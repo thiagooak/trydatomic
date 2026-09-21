@@ -97,7 +97,9 @@
     (testing (str (:slug chapter) " " text)
       ;; what the Run button posts: the text in the editor. run-q refuses anything
       ;; unsafe, so running it is the safety check too.
-      (is (some? (core/run-q dataset text))))))
+      (if (seq forms)
+        (is (some? (core/run-q dataset text)))
+        (is (nil? (core/run-q dataset text)) "an empty editor has nothing to run")))))
 
 (deftest values-come-from-the-database
   (is (= [:p 151] (chapters/expand "x" [:p [:ui/value "pokemon" '[:find (count ?e) . :where [?e :pokemon/name _]]]])))

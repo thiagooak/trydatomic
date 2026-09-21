@@ -48,10 +48,35 @@
    [:code ":type/name"] ". We didn't need a reference between them. "
    "As we saw in " [:a {:href "/anatomy-of-a-query"} "Anatomy of a query"] ", two clauses that use the same variable "
    "have to agree on it. That works on any equal values, whether it is an entity id or a string."]
-  [:p "That lets a query hop across three kinds of links. "
-   "Which Pokemon hit Gengar super-effectively? "
-   "Gengar's type strings lead to their type entities (by value), "
-   "the types strong against those (by reference), "
+  [:p "Let's use that to answer a bigger question: which Pokemon hit Gengar super-effectively? "
+   "We'll build the query one step at a time. First, Gengar's types, as strings:"]
+  [:ui/runnable "pokemon"
+   [:find ?defending-name
+    :where
+    [?gengar :pokemon/name "Gengar"]
+    [?gengar :pokemon/type ?defending-name]]]
+  [:p "Next, the type entities those strings name. " [:code "?defending-name"] " appears in both the "
+   [:code ":pokemon/type"] " clause and the new " [:code ":type/name"] " clause, so they have to agree, "
+   "and the join is by value:"]
+  [:ui/runnable "pokemon"
+   [:find ?defending ?defending-name
+    :where
+    [?gengar :pokemon/name "Gengar"]
+    [?gengar :pokemon/type ?defending-name]
+    [?defending :type/name ?defending-name]]]
+  [:p "Now the types strong against them. This is the reference from the start of the chapter, "
+   "from the attacking type to the defending one:"]
+  [:ui/runnable "pokemon"
+   [:find ?attacking-name
+    :where
+    [?gengar :pokemon/name "Gengar"]
+    [?gengar :pokemon/type ?defending-name]
+    [?defending :type/name ?defending-name]
+    [?attacking :type/strong-against ?defending]
+    [?attacking :type/name ?attacking-name]]]
+  [:p "The last step goes back to Pokemon: the ones that have one of those types. "
+   "The query has hopped across three kinds of links: from Gengar's type strings to their type entities "
+   "(by value), to the types strong against those (by reference), "
    "and back to the Pokemon that have such a type (by value):"]
   [:ui/runnable "pokemon"
    [:find ?name
@@ -75,6 +100,6 @@
     (not-join [?name]
               [?pokemon :pokemon/type ?name])]]
   [:ui/try-tip
-   [:p "Change " [:code "\"Gengar\""] " to another Pokemon, like " [:code "\"Charizard\""] ", in the join. "
+   [:p "Change " [:code "\"Gengar\""] " to another Pokemon, like " [:code "\"Charizard\""] ", in the last join. "
     "Or in the first query, change " [:code "\"Fire\""] " to " [:code "\"Ghost\""] " and "
     [:code ":type/strong-against"] " to " [:code ":type/no-effect-on"] " to see which types can't touch Ghost."]]]}
