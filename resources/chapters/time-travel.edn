@@ -4,7 +4,9 @@
   [:h1 "Time Travel"]
   [:p "Datomic never overwrites anything. When a fact changes, it adds the new fact and records that the old one "
    "was " [:em "retracted"] ". Every fact is stamped with the transaction that added or retracted it, "
-   "and a transaction is an entity like any other."]
+   "and a transaction is an entity like any other. (Two exceptions: Datomic Pro supports "
+   [:em "excision"] ", which permanently erases specific values, and an attribute marked "
+   [:code ":db/noHistory"] " keeps only its current value.)"]
   [:p "Because nothing is lost, the database is a " [:em "value"] " that you can ask about any earlier point. "
    "That is what makes Datomic's time travel possible, and it takes only a few lines of Datalog."]
   [:p "The games changed these " [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/name _]]] " Pokemon over the years, "
@@ -16,8 +18,10 @@
   [:p "Each of our transactions says which generation it records, in " [:code ":tx/generation"] ", "
    "and when those games were first released, in " [:code ":tx/released"] ". "
    "Datomic also stamps every transaction with " [:code ":db/txInstant"] ", the moment it recorded it. "
-   "That is when this server loaded the data, not 1996. So we kept the real-world date ourselves, "
-   "as an attribute of the transaction:"]
+   "That is when this server loaded the data, not 1996, because " [:code ":db/txInstant"] " is "
+   [:em "transaction time"] ": when Datomic learned a fact, not when it was true in the world. "
+   "The real-world release date is " [:em "valid time"] ", and Datomic has no built-in attribute for it, "
+   "so we kept it ourselves, as an attribute of the transaction:"]
   [:ui/runnable "pokemon"
    [:find ?generation ?released ?recorded
     :where
@@ -39,6 +43,20 @@
     [$then ?e :pokemon/name "Clefairy"]
     [$then ?e :pokemon/type ?type]]
    (as-of "Generation V")]
+  [:p [:code "(as-of \"Generation V\")"] " is a shorthand this site provides so you don't have to look up a "
+   "transaction id by hand. The real call is " [:code "(d/as-of db t)"] ", where " [:code "t"]
+   " is a transaction entity id, a basis-t number, or an instant. Written out, "
+   "with the same lookup this site does for you:"]
+  [:ui/code "clojure"
+   "(let [tx (d/q '[:find ?tx . :in $ ?generation
+                :where [?tx :tx/generation ?generation]]
+              db \"Generation V\")
+      then (d/as-of db tx)]
+  (d/q '[:find ?type
+         :where
+         [?e :pokemon/name \"Clefairy\"]
+         [?e :pokemon/type ?type]]
+       then))"]
   [:p "And today, straight from the current database:"]
   [:ui/runnable "pokemon"
    [:find ?type
@@ -56,7 +74,7 @@
     [$ ?e :pokemon/name ?name]
     [$then ?e :stat/attack ?before]
     [$ ?e :stat/attack ?now]
-    [(not= ?before ?now)]]
+    [(< ?before ?now)]]
    (as-of "Generation V")]
   [:p [:code "not"] " works across databases too. Which Pokemon have a type they didn't have in Generation V?"]
   [:ui/runnable "pokemon"
@@ -91,8 +109,8 @@
     "Datomic refuses to run it. That's the full-scan protection in action."]]
 
   [:h2 "since"]
-  [:p [:code "since"] " is the opposite of " [:code "as-of"] ": "
-   "a view with only the facts added " [:em "after"] " a transaction. "
+  [:p [:code "as-of"] " looks at everything up to a point. " [:code "since"] " looks only at what came "
+   "after it: a view with only the facts added " [:em "after"] " a transaction, not the rest of the database. "
    "Which attack values changed after Generation VI? "
    "The Pokemon's name didn't change, so we read it from the current database:"]
   [:ui/runnable "pokemon"
@@ -106,7 +124,8 @@
   [:h2 "A retired attribute"]
   [:p "In Generation I there was a single " [:strong "Special"] " stat, stored in " [:code ":stat/special"] ". "
    "Generation II split it into " [:code ":stat/sp-attack"] " and " [:code ":stat/sp-defense"] ". "
-   "The old attribute is still in the schema, but no Pokemon has it any more. "
+   "Datomic's schema only grows: an attribute, once created, can't be deleted, only stopped from being used. "
+   "So " [:code ":stat/special"] " is still in the schema, but no Pokemon has it any more. "
    "Both eras of Bulbasaur fit in one row:"]
   [:ui/runnable "pokemon"
    [:find ?special ?sp-attack ?sp-defense
