@@ -50,7 +50,8 @@
     (chapter-list chapters current-slug)]))
 
 (defn page [title nav children]
-  (str
+  (let [description "This interactive website will help you learn how to query a Datomic database using Datalog"]
+    (str
    (h/html
     {:mode :html}
     (p/doctype :html5)
@@ -59,7 +60,16 @@
       [:title title]
       [:meta {:charset "UTF-8"}]
       [:meta {:name :viewport :content "width=device-width, initial-scale=1"}]
-      [:meta {:name "description" :content "This interactive website will help you learn how to query a Datomic databases using Datalog"}]
+      [:meta {:name "description" :content description}]
+      [:meta {:property "og:type" :content "website"}]
+      [:meta {:property "og:title" :content title}]
+      [:meta {:property "og:description" :content description}]
+      [:meta {:property "og:image" :content "https://trydatomic.org/og.png"}]
+      [:meta {:property "og:url" :content "https://trydatomic.org/"}]
+      [:meta {:name "twitter:card" :content "summary_large_image"}]
+      [:meta {:name "twitter:title" :content title}]
+      [:meta {:name "twitter:description" :content description}]
+      [:meta {:name "twitter:image" :content "https://trydatomic.org/og.png"}]
       [:link {:rel :preconnect :href "https://fonts.googleapis.com"}]
       [:link {:rel :preconnect :href "https://fonts.gstatic.com" :crossorigin true}]
       [:link {:rel :stylesheet :href "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"}]
@@ -92,7 +102,7 @@
       [:script {:type "module" :src "https://cdn.jsdelivr.net/npm/@thiago.oak/code-highlighter@0.1.2/code-highlighter.js"
                 :integrity "sha384-ZINuo7epnskJ88W6zqeL99sDcuODvwEJ7IN/K8juJMjXW0n1NQvZGzLDOvV1iaWE" :crossorigin "anonymous"}]
       [:script {:type "module" :src "https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.3/bundles/datastar.js"
-                :integrity "sha384-yHqFPXJio1slWODLf67ZFfuDhhPUccOzGpGJF0d5fitjEfihEVrVvzMsfH8TxCiO" :crossorigin "anonymous"}]]])))
+                :integrity "sha384-yHqFPXJio1slWODLf67ZFfuDhhPUccOzGpGJF0d5fitjEfihEVrVvzMsfH8TxCiO" :crossorigin "anonymous"}]]]))))
 
 (def runnable-counter (atom 0))
 
