@@ -17,7 +17,7 @@
     :stat/speed      45}]
   [:p "Each key is an " [:strong "Attribute"] " (:pokemon/name, :stat/speed, etc"
    ") and each value is the " [:strong "Value"] " for that attribute on this entity (Bulbasaur, 45, etc)."]
-  [:p "Datomic assigns every entity a unique " [:strong "entity ID"] " when it is first added. "
+  [:p "Datomic assigns every entity a unique " [:strong "entity id"] " when it is first added. "
    "You never choose it, and because of that, code shouldn't store an entity id outside Datomic. "
    "The " [:a {:href "/relationships"} "Relationships"] " chapter shows how to identify an entity a "
    "different way, with a unique attribute instead. "
@@ -26,7 +26,7 @@
   [:ui/runnable "pokemon"
    [:find ?entity-id
     :where [?entity-id :pokemon/name "Bulbasaur"]]]
-  [:p "Now that we have the concept of an entity ID, we can flip the query around and ask: "
+  [:p "Now that we have the concept of an entity id, we can flip the query around and ask: "
    "what Attributes does this entity have? "
    "We bind the attribute position to a logic variable, then resolve its human-readable name via "
    [:code ":db/ident"] ":"]
@@ -50,7 +50,7 @@
    "Attributes are themselves entities, which is why we can traverse from "
    [:code "?attribute-id"] " to " [:code ":db/ident"] " to get the keyword name."]
   [:p "You may notice one more attribute for Bulbasaur, " [:code ":evolution/next"] ". "
-   "Its value is a number: the entity ID of Ivysaur. This is a " [:strong "reference"]
+   "Its value is a number: the entity id of Ivysaur. This is a " [:strong "reference"]
    " from one entity to another. The " [:a {:href "/relationships"} "Relationships"] " chapter shows how to "
    "query references like this one, and the " [:a {:href "/pull"} "Pull"] " and " [:a {:href "/rules"} "Rules"]
    " chapters follow " [:code ":evolution/next"] " itself to walk Pokemon through their evolutions."]

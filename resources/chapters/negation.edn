@@ -17,7 +17,7 @@
     :where
     [?e :pokemon/name ?name]
     (not [?e :pokemon/type "Grass"])]]
-  [:p "Because " [:code ":pokemon/type"] " is cardinality/many, this excludes Pokemon that have "
+  [:p "Because " [:code ":pokemon/type"] " is " [:code ":db.cardinality/many"] ", this excludes Pokemon that have "
    [:em "any"] " Grass entry, so Bulbasaur (Grass/Poison) is excluded. "
    "Try changing \"Grass\" to \"Fire\" or \"Water\"."]
 
@@ -48,9 +48,14 @@
   [:h2 "missing?"]
   [:p [:code "missing?"] " checks that an entity has no value for a given attribute. "
    "Its arguments are the database binding " [:code "$"] ", the entity variable, and the attribute keyword."]
-  [:p "In our Pokemon database, only Articuno, Zapdos, Moltres, and Mewtwo have a "
-   [:code ":pokemon/category"] ", with the value " [:code ":legendary"] ". "
-   "In Datomic any entity can have any attribute, so for every other Pokemon that fact simply "
+  [:p "In our Pokemon database, only a few have a " [:code ":pokemon/category"]
+   ", with the value " [:code ":legendary"] ":"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?e :pokemon/category :legendary]
+    [?e :pokemon/name ?name]]]
+  [:p "In Datomic any entity can have any attribute, so for every other Pokemon that fact simply "
    "doesn't exist: they are " [:em "missing"] " the attribute. "
    "Where " [:code "get-else"] " in " [:a {:href "/function-clauses"} "Function clauses"]
    " kept those Pokemon and gave them a default, " [:code "missing?"] " keeps only them. "
@@ -68,4 +73,4 @@
   [:ui/try-tip
    [:p "Modify the " [:code "not"] " query at the top to exclude a different type, like \"Ice\" or \"Dragon\". "
     "Or flip the " [:code "missing?"] " demo to find " [:em "legendary"] " Pokemon by replacing "
-    [:code "missing?"] " with a pattern clause " [:code "[?e :pokemon/category :legendary]"] "."]]]}
+    [:code "missing?"] " with a data pattern " [:code "[?e :pokemon/category :legendary]"] "."]]]}

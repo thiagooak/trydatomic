@@ -11,7 +11,7 @@
    "and traverse relationships between entities. You will also parameterize queries, pull whole entities back "
    "as data, write reusable rules, and query the database as it looked at any point in its history. "
    "Every example runs against a real database of all "
-   [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/name _]]] " original Pokémon."]
+   [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/name _]]] " original Pokemon."]
 
   [:h2 "Who this is for"]
   [:p "This guide is for anyone curious about querying with Datomic, whether or not you've used it before. "
@@ -27,7 +27,7 @@
     " to visually separate parts of a query."]]
   [:p "For a deeper look at Clojure's data syntax, see "
    [:a {:href "https://clojure.org/reference/reader"} "the official reader reference"] "."]
-  [:p "No Pokémon expertise is required either. Stats, types, generations, and terms like "
+  [:p "No Pokemon expertise is required either. Stats, types, generations, and terms like "
    "\"super-effective\" or \"legendary\" are explained as they come up, using the data itself."]
 
   [:p "Click the \"Run\" button below to run your first Datomic Datalog query."]
@@ -40,4 +40,4 @@
    "then at how a query is put together, "
    "and last at how the data got into the database."]
   [:ui/try-tip
-   [:p "Edit the query above to return Pokémon of other types like Fire or Electric."]]]}
+   [:p "Edit the query above to return Pokemon of other types like Fire or Electric."]]]}

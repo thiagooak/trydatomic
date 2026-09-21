@@ -5,7 +5,7 @@
   [:p "So far we matched patterns by specifying exact values like "
    [:code "\"Bulbasaur\""] ". Predicates let us filter rows using arbitrary truthy expressions."]
   [:p "A predicate clause is a function call wrapped in an extra pair of brackets:"]
-  [:ui/code "[( > ?speed 100 )]"]
+  [:ui/code "[(> ?speed 100)]"]
   [:p "Every variable used in the predicate must be bound somewhere in the query, not necessarily by an earlier clause. "
    "A variable bound nowhere is the real error:"]
   [:ui/code "?nope not bound in expression clause: [(> ?nope 100)]"]
@@ -20,7 +20,9 @@
     [(> ?speed 100)]]]
   [:ui/try-tip
    [:p "Move " [:code "[(> ?speed 100)]"] " to the top of the " [:code ":where"] " clauses, above the patterns "
-    "that bind " [:code "?e"] " and " [:code "?speed"] ". The query still returns the same 17 Pokemon."]]
+    "that bind " [:code "?e"] " and " [:code "?speed"] ". The query still returns the same "
+    [:ui/value "pokemon" [:find (count ?e) . :where [?e :stat/speed ?speed] [(> ?speed 100)]]]
+    " Pokemon."]]
   [:p "We can compare two bound variables against each other. "
    "Here are the Pokemon whose defense is strictly higher than their attack:"]
   [:ui/runnable "pokemon"
