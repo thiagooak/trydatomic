@@ -22,8 +22,7 @@
     :where
     [?e :stat/speed ?speed]]]
   [:p "Add " [:code "?name"] " as a grouping key to see each Pokemon's speed alongside the extremes "
-   "within its group — or move on to the Find Specifications chapter where you'll learn "
-   "how to return a single value as a scalar."]
+   "within its group."]
 
   [:h2 "avg and sum"]
   [:p [:code "avg"] " and " [:code "sum"] " look simple, but " [:strong "both queries below give the wrong answer"] ". "

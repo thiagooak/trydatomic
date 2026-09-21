@@ -49,8 +49,9 @@
    [:code "?attribute-id"] " to " [:code ":db/ident"] " to get the keyword name."]
   [:p "You may notice one more attribute for Bulbasaur, " [:code ":evolution/next"] ". "
    "Its value is a number: the entity ID of Ivysaur. This is a " [:strong "reference"]
-   " from one entity to another, and we will follow it in the " [:a {:href "/pull"} "Pull"]
-   " and " [:a {:href "/rules"} "Rules"] " chapters."]
+   " from one entity to another. The " [:a {:href "/relationships"} "Relationships"] " chapter shows how to "
+   "query references like this one, and the " [:a {:href "/pull"} "Pull"] " and " [:a {:href "/rules"} "Rules"]
+   " chapters follow " [:code ":evolution/next"] " itself to walk Pokemon through their evolutions."]
   [:p "Try changing \"Bulbasaur\" to another Pokemon name in the queries above."]
   [:p "Take a look at the "
    [:a {:href "https://github.com/thiagooak/trydatomic/blob/main/resources/pokemon.edn?plain=1"} "EDN file"]
