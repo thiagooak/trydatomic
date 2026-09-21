@@ -34,7 +34,10 @@
    "The next chapter puts it to use."]
   [:p "Predicates work on strings too, this site allows "
    [:code "clojure.string/starts-with?"] " and " [:code "clojure.string/includes?"]
-   "; in a real Datomic app, any Clojure function is available. "
+   ". In a real Datomic app, any pure " [:code "clojure.core"] " function is available (except "
+   [:code "eval"] "), along with any Java or Clojure function on the classpath of the process "
+   "that runs the query. With the Client API that process is the server, not your application, "
+   "so your own functions aren't available unless they are deployed there too. "
    "Here we find Pokemon whose name starts with \"S\":"]
   [:ui/runnable "pokemon"
    [:find ?name
@@ -44,14 +47,17 @@
   [:p [:strong "Good to know: "] [:code "="] ", " [:code "!="] ", " [:code "<"] ", " [:code "<="] ", "
    [:code ">"] " and " [:code ">="] " are "
    [:a {:href "https://docs.datomic.com/query/query-data-reference.html#range-predicates"} "range predicates"]
-   ". Datomic answers them with an index instead of checking every value, "
+   ". Datomic answers them with an index instead of checking every value "
+   "(on Datomic Pro this only applies to attributes marked " [:code ":db/index true"] " or "
+   [:code ":db/unique"] "; Datomic Cloud and Local, which this site runs on, index every attribute already), "
    "so they are much more efficient than the same test written with another function. "
    "Datomic's own "
    [:a {:href "https://docs.datomic.com/query/query-data-reference.html#built-in-predicates-and-functions"} "built-in functions"]
    " are also cheaper than your own, since they run inside the query engine. "
    "Our database is too small to notice, but this matters in a real one. "
-   "Strings sort in dictionary order, so the names starting with \"S\" are also the names from \"S\" up to, "
-   "but not including, \"T\". That is the same "
+   "Strings sort by character code, not dictionary order, so uppercase comes before lowercase. "
+   "Every name here is capitalized, which is why the names starting with \"S\" are also the names "
+   "from \"S\" up to, but not including, \"T\". That is the same "
    [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/name ?name] [(clojure.string/starts-with? ?name "S")]]]
    " Pokemon as before:"]
   [:ui/runnable "pokemon"
