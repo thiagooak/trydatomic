@@ -48,6 +48,10 @@
    [:code ":type/name"] ". We didn't need a reference between them. "
    "As we saw in " [:a {:href "/anatomy-of-a-query"} "Anatomy of a query"] ", two clauses that use the same variable "
    "have to agree on it. That works on any equal values, whether it is an entity id or a string."]
+  [:p "This is a shortcut for the tutorial. In a real schema " [:code ":pokemon/type"]
+   " would usually be a " [:code ":db.type/ref"] " to the type entity, which gives "
+   "referential integrity (no typos that silently join to nothing) and lets "
+   [:code "pull"] " follow it directly."]
   [:p "Let's use that to answer a bigger question: which Pokemon hit Gengar super-effectively? "
    "We'll build the query one step at a time. First, Gengar's types, as strings:"]
   [:ui/runnable "pokemon"
