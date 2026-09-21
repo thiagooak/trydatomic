@@ -106,8 +106,9 @@
      (evolves-into? ?b ?c)]]]
 
   [:h2 "Rules over relationships"]
-  [:p "In the " [:a {:href "/relationships"} "Relationships"] " chapter we built a query to find the Pokemon "
-   "that hit Gengar super-effectively. Here it is again, all seven clauses of it:"]
+  [:p "In the " [:a {:href "/relationships"} "Relationships"] " chapter we built a query for Pokemon with a type "
+   "strong against one of Gengar's types, what that chapter calls \"super-effective\" as a shorthand. "
+   "Here it is again, all seven clauses of it:"]
   [:ui/runnable "pokemon"
    [:find ?name
     :where

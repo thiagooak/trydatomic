@@ -22,7 +22,7 @@
 ;; also the list of datasets a request may ask for.
 (def ^:private db-values
   (into {} (map (fn [dataset] [dataset (delay (load-dataset dataset))]))
-        ["friends" "pokemon"]))
+        ["pokemon"]))
 
 (defn dataset? [dataset]
   (contains? db-values dataset))

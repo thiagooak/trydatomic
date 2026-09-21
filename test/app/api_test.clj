@@ -43,11 +43,11 @@
          (count (run-q "pokemon" "[:find ?a ?b :where [?x :pokemon/name ?a] [?y :pokemon/name ?b]]")))))
 
 (deftest concurrent-queries-do-not-interfere
-  (let [pokemon "[:find (count ?e) . :where [?e :pokemon/name _]]"
-        friends "[:find (count ?e) . :where [?e :person/first-name _]]"
-        jobs (take 80 (cycle [["pokemon" pokemon] ["pokemon" pokemon] ["friends" friends] ["pokemon" pokemon]]))
-        results (doall (pmap (fn [[dataset q]] [dataset (run-q dataset q)]) jobs))]
-    (is (every? (fn [[dataset n]] (= n (if (= dataset "pokemon") 151 7))) results))))
+  (let [all "[:find (count ?e) . :where [?e :pokemon/name _]]"
+        grass "[:find (count ?e) . :where [?e :pokemon/type \"Grass\"]]"
+        jobs (take 80 (cycle [[all 151] [all 151] [grass 14] [all 151]]))
+        results (doall (pmap (fn [[q expected]] [expected (run-q "pokemon" q)]) jobs))]
+    (is (every? (fn [[expected n]] (= expected n)) results))))
 
 (deftest api-endpoint
   (testing "answers with the query result under the requested output name"

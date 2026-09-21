@@ -107,6 +107,11 @@
     [?attacking :type/name ?attacking-name]
     [?e :pokemon/type ?attacking-name]
     [?e :pokemon/name ?name]]]
+  [:p "\"Super-effectively\" is a simplification worth naming: a real Pokemon attacks with " [:em "moves"]
+   ", whose type doesn't have to match its own, and having two types multiplies the bonus rather than "
+   "just adding an attacker. What the rule actually finds is \"has a type strong against one of Gengar's types.\" "
+   "That is also why Gengar, Haunter and Gastly show up in their own results: the type chart lists Ghost "
+   "as strong against Ghost, and all three are Ghost type."]
 
   [:h2 "Negation across relationships"]
   [:p [:code "not-join"] " works across relationships too. "
