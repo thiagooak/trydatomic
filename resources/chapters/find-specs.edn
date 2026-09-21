@@ -7,25 +7,6 @@
    "Datomic Datalog offers four distinct find specifications, each returning a different shape. "
    "Choosing the right one makes downstream code simpler."]
 
-  [:h3 "Peer API vs Client API"]
-  [:p "Datomic has two Clojure APIs for running queries: the " [:strong "Peer API"]
-   " (" [:code "datomic.api"] ") and the " [:strong "Client API"]
-   " (" [:code "datomic.client.api"] "). They handle find specs differently, "
-   "so it helps to know which one your own code uses."]
-  [:ul
-   [:li [:strong "Peer API: "] "all four find specs work as described below, "
-    "and a relation find returns a " [:em "set"] " of tuples."]
-   [:li [:strong "Client API: "] "only relation finds are accepted, and they return a "
-    [:em "vector"] " of tuples instead of a set. To get the other shapes, reshape the result yourself: "
-    [:code "(mapv first result)"] " for a collection, "
-    [:code "(ffirst result)"] " for a scalar, "
-    [:code "(first result)"] " for a tuple."]]
-  [:p "This site runs on Datomic Local, which uses the Client API. "
-   "So you can still try every form, the server rewrites each query into a relation find "
-   "and reshapes the result to match what the Peer API would give you. "
-   "The one visible difference is the relation example below, which prints as a vector "
-   "where the Peer API would print a set."]
-
   [:h2 "Relation (default) — collection of tuples"]
   [:p "The standard form. Each variable becomes a column; each matching combination becomes a row. "
    "Order within the set is not guaranteed."]
@@ -102,4 +83,24 @@
   [:ui/try-tip
    [:p "Look up other Pokemon by number in the safe query, such as \"150\" or \"143\". "
     "Then change the name in the Bulbasaur query to \"Charizard\" or \"Pikachu\" and predict the result each time. "
-    "Or combine the scalar spec with " [:code "(min ?speed)"] " to return just the single lowest speed value in the Pokedex."]]]}
+    "Or combine the scalar spec with " [:code "(min ?speed)"] " to return just the single lowest speed value in the Pokedex."]]
+
+  [:details
+   [:summary [:strong "Under the hood: Peer API vs Client API"]]
+   [:p "Datomic has two Clojure APIs for running queries: the " [:strong "Peer API"]
+    " (" [:code "datomic.api"] ") and the " [:strong "Client API"]
+    " (" [:code "datomic.client.api"] "). They handle find specs differently, "
+    "so it helps to know which one your own code uses."]
+   [:ul
+    [:li [:strong "Peer API: "] "all four find specs work as described above, "
+     "and a relation find returns a " [:em "set"] " of tuples."]
+    [:li [:strong "Client API: "] "only relation finds are accepted, and they return a "
+     [:em "vector"] " of tuples instead of a set. To get the other shapes, reshape the result yourself: "
+     [:code "(mapv first result)"] " for a collection, "
+     [:code "(ffirst result)"] " for a scalar, "
+     [:code "(first result)"] " for a tuple."]]
+   [:p "This site runs on Datomic Local, which uses the Client API. "
+    "So you can still try every form above, the server rewrites each query into a relation find "
+    "and reshapes the result to match what the Peer API would give you. "
+    "The one visible difference is the relation example at the top of this chapter, which prints as a vector "
+    "where the Peer API would print a set."]]]}
