@@ -21,7 +21,7 @@
    "You never choose it, and because of that, code shouldn't store an entity id outside Datomic. "
    "The " [:a {:href "/relationships"} "Relationships"] " chapter shows how to identify an entity a "
    "different way, with a unique attribute instead. "
-   "(See " [:a {:href "https://docs.datomic.com/whatis/data-model.html"} "the Datomic data model"] ".) "
+   "(See " [:a {:href "https://docs.datomic.com/data-model.html"} "the Datomic data model"] ".) "
    "Let's find Bulbasaur's:"]
   [:ui/runnable "pokemon"
    [:find ?entity-id
@@ -45,7 +45,7 @@
     [?entity-id ?attribute-id ?value]
     [?attribute-id :db/ident ?attribute]]]
   [:p "This works because of Datomic's "
-   [:a {:href "https://docs.datomic.com/whatis/data-model.html#universal"} "Universal Schema"]
+   [:a {:href "https://docs.datomic.com/data-model.html#universal"} "Universal Schema"]
    ". Every fact in the database is stored following this Entity-Attribute-Value structure. "
    "Attributes are themselves entities, which is why we can traverse from "
    [:code "?attribute-id"] " to " [:code ":db/ident"] " to get the keyword name."]

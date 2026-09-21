@@ -1,6 +1,6 @@
 # Learn Datalog
 
-An interactive web app for learning [Datomic Datalog](https://docs.datomic.com/whatis/supported-ops.html#datalog).
+An interactive web app for learning [Datomic Datalog](https://docs.datomic.com/supported-ops.html#datalog).
 
 The app serves a series of exercises. Each exercise includes an editable Datalog query that runs against a Datomic database populated with Pokemon data.
 
