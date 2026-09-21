@@ -103,6 +103,12 @@
    "Datomic refuses any pattern that would scan every fact in the database, "
    "in history or otherwise. Binding the entity, like we did above, is enough; "
    "only the attribute stays free."]
+  [:p "That Generation VI change is two facts in one transaction, a retraction and an assertion "
+   "on the same entity and attribute. Nothing is overwritten in place; the old value leaves "
+   "explicitly, and the new one is added as its own fact:"]
+  [:ui/code "clojure"
+   "(d/transact conn {:tx-data [[:db/retract [:pokemon/number \"035\"] :pokemon/type \"Normal\"]
+                            [:db/add     [:pokemon/number \"035\"] :pokemon/type \"Fairy\"]]})"]
   [:ui/try-tip
    [:p "Remove the entity binding from the history query above, leaving "
     [:code "[$history ?e ?a ?v ?tx ?added]"] " on its own with nothing bound. "
@@ -152,4 +158,13 @@
    [:p "Change the generation in the last query to " [:code "\"Generation II\""] " and then "
     [:code "\"Generation VI\""] " to watch Steel, Dark and Fairy arrive. "
     "Or change " [:code ":stat/attack"] " to " [:code ":stat/defense"] " in the two-database query "
-    "to see who got more defense."]]]}
+    "to see who got more defense."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Query the database as it looked at any past transaction with " [:code "as-of"]
+     ", or only what changed after one with " [:code "since"] "."]
+    [:li "Read the full history of an attribute, including retractions, with " [:code "history"] "."]
+    [:li "Tell transaction time (" [:code ":db/txInstant"] ") apart from valid time, "
+     "and explain why Datomic's schema only grows."]]]]}

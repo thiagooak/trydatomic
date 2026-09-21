@@ -121,4 +121,13 @@
   [:ui/try-tip
    [:p "Change " [:code "\"Gengar\""] " to another Pokemon, like " [:code "\"Charizard\""] ", in the last join. "
     "Or in the first query, change " [:code "\"Fire\""] " to " [:code "\"Ghost\""] " and "
-    [:code ":type/strong-against"] " to " [:code ":type/no-effect-on"] " to see which types can't touch Ghost."]]]}
+    [:code ":type/strong-against"] " to " [:code ":type/no-effect-on"] " to see which types can't touch Ghost."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Declare a reference attribute with " [:code ":db.type/ref"] ", "
+     "and connect entities with a lookup ref instead of an entity id."]
+    [:li "Follow a reference in either direction, and join by shared value when no reference exists."]
+    [:li "Chain several hops, by value and by reference, into one query, "
+     "and negate across a relationship with " [:code "not-join"] "."]]]]}

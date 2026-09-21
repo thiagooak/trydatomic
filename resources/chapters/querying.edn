@@ -61,4 +61,11 @@
    "It is written as one transaction for each game generation, which the "
    [:a {:href "/time-travel"} "Time travel"] " chapter explains."]
   [:p "Run the last query with a dual-typed Pokemon like \"Charizard\" and observe "
-   "how many attribute-value rows appear: one for each fact stored about that entity."]]}
+   "how many attribute-value rows appear: one for each fact stored about that entity."]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Read a Pokemon's stored facts as entity/attribute/value triples."]
+    [:li "Find an entity's id, then use it to list its own attributes and values."]
+    [:li "Explain why the same query shape works on any entity, thanks to Datomic's universal schema."]]]]}

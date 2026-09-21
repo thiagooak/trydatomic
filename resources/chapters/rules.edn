@@ -212,4 +212,11 @@
     "Or swap the two arguments of " [:code "super-effective?"] " in the first Gengar query above, "
     "to ask which Pokemon Gengar hits super-effectively. "
     "Or edit the " [:code "strong?"] " rule to require both attack > 90 "
-    [:em "and"] " speed > 90, and see how many Pokemon meet both criteria."]]]}
+    [:em "and"] " speed > 90, and see how many Pokemon meet both criteria."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Name a group of " [:code ":where"] " clauses as a rule, and invoke it like a built-in clause."]
+    [:li "Give a rule multiple definitions for OR logic, or make it recursive with a base case."]
+    [:li "Compose rules from other rules, and use them alongside negation and function clauses."]]]]}

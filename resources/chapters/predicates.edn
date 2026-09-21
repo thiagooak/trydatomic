@@ -77,4 +77,14 @@
   [:ui/try-tip
    [:p "Combine two predicates to find Pokemon whose name starts with \"S\" "
     [:em "and"] " whose speed is above 100. "
-    "Or find Pokemon whose attack " [:em "and"] " defense are both above 80."]]]}
+    "Or find Pokemon whose attack " [:em "and"] " defense are both above 80."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Write a predicate clause to filter rows on any truthy expression, "
+     "including a comparison between two bound variables."]
+    [:li "Recognize the \"not bound in expression clause\" error, "
+     "and know every predicate variable must be bound somewhere in the query."]
+    [:li "Know that Datomic answers range predicates with an index, "
+     "and that strings sort by character code, not dictionary order."]]]]}

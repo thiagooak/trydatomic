@@ -66,4 +66,13 @@
 
   [:ui/try-tip
    [:p "Find the Pokemon that are both Water and Ice. "
-    "Then rename the variable in one of the type patterns, and predict how the result changes before you run it."]]]}
+    "Then rename the variable in one of the type patterns, and predict how the result changes before you run it."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Name every part of a query: " [:code ":find"] ", " [:code ":where"]
+     ", data patterns, and logic variables."]
+    [:li "Explain why sharing a variable between two patterns performs a join."]
+    [:li "Know that " [:code ":where"] " clauses are combined with AND, "
+     "and that results are an unordered, deduplicated set of tuples."]]]]}

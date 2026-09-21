@@ -125,4 +125,14 @@
     [:code "[?e :pokemon/type ?type]"] " clause too, and if you drop " [:code ":with ?e"]
     " the Pokemon that share an attack within a type merge again. "
     "Or use " [:code "(min ?attack)"] " and " [:code "(max ?attack)"] " together to see the attack range per type. "
-    "Those need no " [:code ":with"] "."]]]}
+    "Those need no " [:code ":with"] "."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Group query results and collapse them with " [:code "count"] ", " [:code "min"] ", "
+     [:code "max"] ", " [:code "sum"] ", and " [:code "avg"] "."]
+    [:li "Explain why " [:code "sum"] ", " [:code "avg"] " and " [:code "count"]
+     " can silently drop rows, and fix it by adding the entity to " [:code ":with"] "."]
+    [:li "Tell " [:code "count"] " apart from " [:code "count-distinct"]
+     " when " [:code ":with"] " reintroduces duplicate values."]]]]}

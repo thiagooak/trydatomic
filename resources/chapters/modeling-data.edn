@@ -144,4 +144,12 @@
    [:find ?name ?category
     :where
     [?e :pokemon/name ?name]
-    [?e :pokemon/category ?category]]]]}
+    [?e :pokemon/category ?category]]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Compare a relational schema to Datomic's entity/attribute/value model."]
+    [:li "Define an attribute with " [:code ":db/ident"] ", " [:code ":db/valueType"]
+     ", and " [:code ":db/cardinality"] "."]
+    [:li "Explain why Datomic has no NULLs: an attribute the entity lacks is simply not stored."]]]]}

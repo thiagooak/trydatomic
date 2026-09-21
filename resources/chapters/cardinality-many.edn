@@ -48,4 +48,11 @@
   [:ui/try-tip
    [:p "Modify the dual-type query to also return " [:code "?type1"] " and "
     [:code "?type2"] " in " [:code ":find"] " to see which type combinations appear. "
-    "Or change \"Bulbasaur\" in the first query to \"Charmander\" and compare the number of rows."]]]}
+    "Or change \"Bulbasaur\" in the first query to \"Charmander\" and compare the number of rows."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Explain why a cardinality-many attribute produces one result row per value."]
+    [:li "Join an attribute to itself to find entities that have more than one distinct value for it."]
+    [:li "Use " [:code "count"] " to collapse those per-value rows into a single number per entity."]]]]}

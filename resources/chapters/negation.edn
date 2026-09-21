@@ -73,4 +73,13 @@
   [:ui/try-tip
    [:p "Modify the " [:code "not"] " query at the top to exclude a different type, like \"Ice\" or \"Dragon\". "
     "Or flip the " [:code "missing?"] " demo to find " [:em "legendary"] " Pokemon by replacing "
-    [:code "missing?"] " with a data pattern " [:code "[?e :pokemon/category :legendary]"] "."]]]}
+    [:code "missing?"] " with a data pattern " [:code "[?e :pokemon/category :legendary]"] "."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Exclude rows with " [:code "not"] ", and know every variable inside it "
+     "must already be bound outside."]
+    [:li "Use " [:code "not-join"] " when the negation needs a variable of its own, "
+     "like a " [:code "not="] " check on a self-joined attribute."]
+    [:li "Use " [:code "missing?"] " to keep only the entities that lack a given attribute entirely."]]]]}
