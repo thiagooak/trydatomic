@@ -8,7 +8,9 @@
 
   [:h2 "not"]
   [:p [:code "not"] " excludes any entity for which the inner pattern matches. "
-   "Variables already bound in the outer query are automatically joined. "
+   "Variables already bound in the outer query are automatically joined — but that's the only kind of "
+   "variable a plain " [:code "not"] " can use. Every variable inside it must already be bound outside; "
+   "there's no way to introduce a new one that stays local to the negation. "
    "Let's find Pokemon that are not Grass type:"]
   [:ui/runnable "pokemon"
    [:find ?name
@@ -20,12 +22,22 @@
    "Try changing \"Grass\" to \"Fire\" or \"Water\"."]
 
   [:h2 "not-join"]
-  [:p [:code "not-join"] " works like " [:code "not"] " but lets you introduce fresh variables "
-   "inside the negation that are only used there. "
-   "You declare explicitly which outer variables to join."]
-  [:p "Here we find " [:strong "single-type Pokemon"] " — those for which there is no second, "
+  [:p "Here we want to find " [:strong "single-type Pokemon"] " — those for which there is no second, "
    "different type value. It reuses the " [:code "not="] " comparison from "
-   [:a {:href "/cardinality-many"} "Cardinality many"] ":"]
+   [:a {:href "/cardinality-many"} "Cardinality many"] ". Before running it, predict: what happens if we "
+   "write the negation with plain " [:code "not"] ", using a fresh variable " [:code "?other"]
+   " that's never bound outside it?"]
+  [:ui/runnable "pokemon"
+   [:find ?name ?type
+    :where
+    [?e :pokemon/name ?name]
+    [?e :pokemon/type ?type]
+    (not [?e :pokemon/type ?other]
+         [(not= ?type ?other)])]]
+  [:p "Datomic refuses: " [:code "?other not bound in not clause"] ". Every variable inside a plain "
+   [:code "not"] " must already be bound outside it — " [:code "?other"] " is new, so there's nowhere for "
+   "it to come from. " [:code "not-join"] " is the fix: it lets you introduce fresh variables inside the "
+   "negation, as long as you declare explicitly which outer variables to join:"]
   [:ui/runnable "pokemon"
    [:find ?name ?type
     :where
