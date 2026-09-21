@@ -5,7 +5,7 @@
   [:p "So far we have queried data that was already in the database. "
    "Now let's see how it got there. To understand Datomic's data model, "
    "we will compare it with a relational database, using a small slice of our Pokemon data."]
-  [:p "In SQL we would need two tables. A Pokemon has one or two types, "
+  [:p "The normalised way in SQL needs two tables. A Pokemon has one or two types, "
    "so the types can't live in a single column of the " [:code "pokemon"] " table. "
    "They go in a second table that points back to it."]
   [:div {:style {:display "flex" :flex-wrap "wrap" :gap "1em"}}
@@ -45,9 +45,11 @@
 
   [:p "Let's rewrite this database using Datomic."]
 
-  [:p "We can't use the two tables we had before. Datomic has a "
+  [:p "We won't need a second table for this. Datomic has a "
    [:a {:href "https://docs.datomic.com/data-model.html#universal"} "Universal Schema"]
-   ". Think of it as one big table with five columns that stores " [:strong "everything"] " in our Database. For now, let's focus on three of the five columns."]
+   ". Think of it as one big table with five columns that stores " [:strong "everything"] " in our Database. "
+   "For now, let's focus on three of the five columns, we'll meet the other two in "
+   [:a {:href "/time-travel"} "Time travel"] "."]
 
   [:ol
    [:li [:strong "Entity"] " identifies the \"thing\" we are referring to"]
