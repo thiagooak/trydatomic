@@ -27,7 +27,11 @@
     [(>= ?total 600)]]]
 
   [:h2 "Watch out for integer division"]
-  [:p "Dividing one integer by another gives an integer, rounded down. "
+  [:p "Dividing one integer by another drops the fractional part rather than rounding down: "
+   "Datomic's " [:code "/"] " truncates toward zero, like Clojure's " [:code "quot"] ". "
+   "For negative numbers that differs from a floor: " [:code "(/ -7 2)"] " is " [:code "-3"]
+   ", not " [:code "-4"] ". It also isn't a ratio like Clojure's own " [:code "/"]
+   " would give: dividing 11 by 9 here gives the integer " [:code "1"] ", not " [:code "11/9"] ". "
    "Multiply one side by " [:code "1.0"] " first to get a decimal. "
    "Mewtwo's attack is 110 and its defense is 90:"]
   [:ui/runnable "pokemon"
@@ -70,9 +74,15 @@
     :where
     [?e :pokemon/name _]
     [(get-else $ ?e :pokemon/category :regular) ?category]]]
+  [:p "get-else has two limits worth knowing. The attribute must be cardinality one: asking it for "
+   [:code ":pokemon/type"] " (cardinality many) refuses with " [:code "cardinality-many attrs not supported: :pokemon/type"]
+   ". And the default can't be " [:code "nil"] ": that refuses too, with " [:code "nil default value not supported"]
+   ". Use a sentinel value like " [:code ":none"] " instead."]
   [:p "The next chapter, " [:a {:href "/negation"} "Negation"] ", shows the opposite: "
    [:code "missing?"] " keeps only the Pokemon that lack the attribute."]
 
   [:ui/try-tip
    [:p "Lower the total in the first query to " [:code "580"] " to see the legendary birds join the list. "
-    "Or wrap the label in " [:code "clojure.string/upper-case"] " with another function clause."]]]}
+    "Or wrap the label in " [:code "clojure.string/upper-case"] " with another function clause. "
+    "Or change " [:code ":pokemon/category"] " to " [:code ":pokemon/type"] " in the get-else query above "
+    "to see the cardinality-many error for yourself."]]]}
