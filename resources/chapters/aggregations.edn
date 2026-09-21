@@ -47,7 +47,8 @@
 
   [:h2 "The :with clause"]
   [:p "The sum is too small because of how Datomic aggregates. "
-   "Before aggregation, Datomic builds a " [:strong "set"] " from the " [:code ":find"] " variables. "
+   "Before aggregation, Datomic builds a " [:strong "set"] " from the " [:code ":find"] " variables "
+   "(plus " [:code ":with"] " variables). "
    "Rows that look identical after projecting onto those variables are merged. "
    "The HP query has only one variable, " [:code "?hp"] ", so two Pokemon with the same HP "
    "become a single row, and the second one is never added."]
