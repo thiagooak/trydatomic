@@ -138,7 +138,7 @@
    (as-of "Generation I")]
 
   [:h2 "Types come and go"]
-  [:p "The first games had 15 types. Steel and Dark arrived in Generation II, and Fairy in Generation VI. "
+  [:p "The type list has grown since. Steel and Dark arrived in Generation II, and Fairy in Generation VI. "
    "We recorded when each type appeared, not every later change to how types fare against each other, "
    "so the type chart you see for a past generation is today's, restricted to the types that existed then. "
    "How many types were there in Generation I?"]

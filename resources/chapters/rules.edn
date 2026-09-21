@@ -193,7 +193,19 @@
      [?e :stat/sp-defense ?sp-defense]
      [?e :stat/speed ?speed]
      [(+ ?hp ?attack ?defense ?sp-attack ?sp-defense ?speed) ?total]]]]
-  [:p "Charizard's total is 534. These are the Pokemon with a higher one."]
+  [:p "Charizard's total is "
+   [:ui/value "pokemon"
+    [:find ?total .
+     :where
+     [?e :pokemon/name "Charizard"]
+     [?e :stat/hp ?hp]
+     [?e :stat/attack ?attack]
+     [?e :stat/defense ?defense]
+     [?e :stat/sp-attack ?sp-attack]
+     [?e :stat/sp-defense ?sp-defense]
+     [?e :stat/speed ?speed]
+     [(+ ?hp ?attack ?defense ?sp-attack ?sp-defense ?speed) ?total]]]
+   ". These are the Pokemon with a higher one."]
 
   [:ui/try-tip
    [:p "Change " [:code "\"Bulbasaur\""] " to " [:code "\"Eevee\""] " in the recursive query to see it branch. "

@@ -6,10 +6,6 @@
    "But " [:code ":pokemon/type"] " is declared " [:code ":db.cardinality/many"] " in "
    [:a {:href "/modeling-data"} "Modeling data"] ", "
    "meaning an entity can have multiple values for the same attribute."]
-  [:p "In the schema this looks like:"]
-  [:ui/code {:db/ident       :pokemon/type
-             :db/valueType   :db.type/string
-             :db/cardinality :db.cardinality/many}]
   [:p "The consequence for queries is important: "
    "binding a cardinality/many attribute produces " [:strong "one result row per value"] ". "
    "Let's see it in action. Run this query and notice how Bulbasaur appears twice:"]
