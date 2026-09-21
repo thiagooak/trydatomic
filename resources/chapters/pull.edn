@@ -167,4 +167,11 @@
   [:p "This gives Charmander's whole evolution line as a nested map."]
   [:ui/try-tip
    [:p "Change " [:code "\"Charmander\""] " to " [:code "\"Eevee\""] " in the recursive pull to see it branch three ways. "
-    "Or add " [:code ":stat/attack"] " and " [:code ":stat/defense"] " to the selective pull pattern at the top of this page."]]]}
+    "Or add " [:code ":stat/attack"] " and " [:code ":stat/defense"] " to the selective pull pattern at the top of this page."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Retrieve a whole entity, or a chosen subset of attributes, as one map with " [:code "pull"] "."]
+    [:li "Follow a reference forward or backward, and recurse across a chain of them with " [:code "..."] "."]
+    [:li "Rename, limit, or default an attribute's value with pull's per-attribute options."]]]]}

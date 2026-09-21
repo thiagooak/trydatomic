@@ -85,4 +85,12 @@
    "then the results are combined."]
   [:ui/try-tip
    [:p "Change the range in the tuple example to " [:code "[50 70]"] " to see which Pokemon fall in that band. "
-    "Or add another type, like " [:code "\"Fire\""] ", to the collection example and run it again."]]]}
+    "Or add another type, like " [:code "\"Fire\""] ", to the collection example and run it again."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Parameterize a query with " [:code ":in"] " instead of hard-coding a value into it."]
+    [:li "Bind a collection, a tuple, or a relation of inputs, not just a single scalar."]
+    [:li "Know that every query has an implicit " [:code ":in $"] ", "
+     "and that any input you add comes after it, in order."]]]]}

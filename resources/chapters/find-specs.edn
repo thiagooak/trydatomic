@@ -103,4 +103,11 @@
     "So you can still try every form above, the server rewrites each query into a relation find "
     "and reshapes the result to match what the Peer API would give you. "
     "The one visible difference is the relation example at the top of this chapter, which prints as a vector "
-    "where the Peer API would print a set."]]]}
+    "where the Peer API would print a set."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Choose the find spec, relation, collection, scalar, or tuple, that matches the shape your code needs."]
+    [:li "Know what makes a tuple spec safe: a unique lookup plus cardinality-one attributes."]
+    [:li "Explain how the Peer and Client APIs differ in the result shapes they return."]]]]}

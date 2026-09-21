@@ -40,4 +40,12 @@
     "second branch, so the two branches disagree on which variables they share; "
     [:code "or-join"] " gets around this by declaring up front which ones actually are shared. "
     "Modify the " [:code "or-join"] " query to find Pokemon that are Ground-type "
-    [:em "or"] " have attack above 120."]]]}
+    [:em "or"] " have attack above 120."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Match rows against any of several alternatives with " [:code "or"] "."]
+    [:li "Know why " [:code "or"] " requires every branch to use the same set of variables."]
+    [:li "Use " [:code "or-join"] " to let branches introduce their own local variables, "
+     "declaring only what's shared with the outer query."]]]]}

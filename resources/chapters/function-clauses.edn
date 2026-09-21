@@ -85,4 +85,13 @@
    [:p "Lower the total in the first query to " [:code "580"] " to see the legendary birds join the list. "
     "Or wrap the label in " [:code "clojure.string/upper-case"] " with another function clause. "
     "Or change " [:code ":pokemon/category"] " to " [:code ":pokemon/type"] " in the get-else query above "
-    "to see the cardinality-many error for yourself."]]]}
+    "to see the cardinality-many error for yourself."]]
+
+  [:div {:class "recap"}
+   [:span {:class "recap-label"} "You can now"]
+   [:ul
+    [:li "Bind a new variable to the result of a function with a function clause, "
+     "and reuse it in later clauses or " [:code ":find"] "."]
+    [:li "Know that Datomic's " [:code "/"] " truncates toward zero rather than giving a true division."]
+    [:li "Use " [:code "get-else"] " to supply a default for a missing cardinality-one attribute, "
+     "and know its two limits."]]]]}
