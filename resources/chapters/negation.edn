@@ -24,20 +24,8 @@
   [:h2 "not-join"]
   [:p "Here we want to find " [:strong "single-type Pokemon"] " — those for which there is no second, "
    "different type value. It reuses the " [:code "not="] " comparison from "
-   [:a {:href "/cardinality-many"} "Cardinality many"] ". Before running it, predict: what happens if we "
-   "write the negation with plain " [:code "not"] ", using a fresh variable " [:code "?other"]
-   " that's never bound outside it?"]
-  [:ui/runnable "pokemon"
-   [:find ?name ?type
-    :where
-    [?e :pokemon/name ?name]
-    [?e :pokemon/type ?type]
-    (not [?e :pokemon/type ?other]
-         [(not= ?type ?other)])]]
-  [:p "Datomic refuses: " [:code "?other not bound in not clause"] ". Every variable inside a plain "
-   [:code "not"] " must already be bound outside it — " [:code "?other"] " is new, so there's nowhere for "
-   "it to come from. " [:code "not-join"] " is the fix: it lets you introduce fresh variables inside the "
-   "negation, as long as you declare explicitly which outer variables to join:"]
+   [:a {:href "/cardinality-many"} "Cardinality many"] ". The check needs " [:code "?other"]
+   ", a variable that only makes sense inside the negation:"]
   [:ui/runnable "pokemon"
    [:find ?name ?type
     :where
@@ -49,6 +37,13 @@
   [:p "For each " [:code "?name"] "/" [:code "?type"] " pair, "
    [:code "not-join"] " checks whether a different type value " [:code "?other"] " exists on the same entity. "
    "If it does, the row is dropped — leaving only single-type Pokemon."]
+  [:ui/try-tip
+   [:p "Before running the next thing, predict: change " [:code "not-join [?e ?type]"] " above to plain "
+    [:code "not"] " and run it. Datomic refuses: " [:code "?other not bound in not clause"]
+    ". Every variable inside a plain " [:code "not"] " must already be bound outside it — "
+    [:code "?other"] " is new, so there's nowhere for it to come from. That's exactly why "
+    [:code "not-join"] " exists: it lets you introduce fresh variables inside the negation, as long "
+    "as you declare explicitly which outer variables to join."]]
 
   [:h2 "missing?"]
   [:p [:code "missing?"] " checks that an entity has no value for a given attribute. "

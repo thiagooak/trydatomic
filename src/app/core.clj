@@ -165,7 +165,15 @@
           ;; share no variable) can use more memory than we have. The query's
           ;; data is garbage by now, so the server carries on.
           (catch OutOfMemoryError _
-            (throw (user-error "That query needs too much memory. Check that its clauses share variables, otherwise every row is combined with every other row."))))))))
+            (throw (user-error "That query needs too much memory. Check that its clauses share variables, otherwise every row is combined with every other row.")))
+          ;; Datomic signals some query errors, like mismatched or/or-join
+          ;; branches, as an AssertionError instead of an anomaly. That is a
+          ;; Java Error, not an Exception, so it must be caught here too or it
+          ;; escapes as a raw 500.
+          (catch AssertionError e
+            (if (str/includes? (.getMessage e) "clauses in 'or' must use same set of vars")
+              (throw (user-error "All clauses in `or` must use the same set of variables. Use `or-join` to declare which ones are shared."))
+              (throw (ex-info (.getMessage e) {} e)))))))))
 
 (defn- error-message
   "Datomic's own error messages help people fix their query. Anything else is

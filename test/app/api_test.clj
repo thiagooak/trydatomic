@@ -56,6 +56,12 @@
     (is (re-find #"unbound" (ask "[:find ?nope :where [?e :pokemon/name ?n]]"))))
   (testing "rejections are explained"
     (is (= "Unsafe Query: System/exit is not allowed" (ask "[:find ?x :where [(System/exit 0) ?x]]"))))
+  (testing "a mismatched or is a readable message and a 200, not a raw 500"
+    (let [q "[:find ?name :where [?e :pokemon/name ?name] (or [?e :pokemon/type \"Electric\"] (and [?e :stat/speed ?speed] [(> ?speed 100)]))]"
+          response (post {"dataset" "pokemon" "in" "in1" "out" "out1"} (json/write-str {"in1" q}))]
+      (is (= 200 (:status response)))
+      (is (re-find #"All clauses in `or` must use the same set of variables"
+                   (get (json/read-str (:body response)) "out1")))))
   (testing "malformed requests get a 400"
     (is (= 400 (:status (post {"dataset" "pokemon" "in" "in1" "out" "out1"} "not json"))))
     (is (= 400 (:status (post {"dataset" "pokemon" "in" "in1"} "{}"))))
