@@ -6,7 +6,11 @@
    [:code "\"Bulbasaur\""] ". Predicates let us filter rows using arbitrary truthy expressions."]
   [:p "A predicate clause is a function call wrapped in an extra pair of brackets:"]
   [:ui/code "[( > ?speed 100 )]"]
-  [:p "Every variable used in the predicate must already be bound by an earlier pattern clause. "
+  [:p "Every variable used in the predicate must be bound somewhere in the query — not necessarily by an earlier clause. "
+   "A variable bound nowhere is the real error:"]
+  [:ui/code "?nope not bound in expression clause: [(> ?nope 100)]"]
+  [:p "Order still matters for two other reasons, though: data patterns run in the order written, so put the "
+   "selective ones first for performance, and predicates read best right after the clause that binds their variables. "
    "Let's find all Pokemon with a speed stat above 100:"]
   [:ui/runnable "pokemon"
    [:find ?name ?speed
@@ -14,6 +18,9 @@
     [?e :pokemon/name ?name]
     [?e :stat/speed ?speed]
     [(> ?speed 100)]]]
+  [:ui/try-tip
+   [:p "Move " [:code "[(> ?speed 100)]"] " to the top of the " [:code ":where"] " clauses, above the patterns "
+    "that bind " [:code "?e"] " and " [:code "?speed"] ". The query still returns the same 17 Pokemon."]]
   [:p "We can compare two bound variables against each other. "
    "Here are the Pokemon whose defense is strictly higher than their attack:"]
   [:ui/runnable "pokemon"
