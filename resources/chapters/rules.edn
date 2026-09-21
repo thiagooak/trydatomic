@@ -10,8 +10,8 @@
   [:h2 "Defining and using a rule"]
   [:p "A rule is a collection of " [:em "definitions"] ". "
    "Each definition is a vector whose first element is the " [:em "head"]
-   " — the rule name and its parameters, like " [:code "(strong? ?e)"]
-   " — followed by the " [:em "body"] ": the clauses that must match. Rules are passed to the query as an input, "
+   " (the rule name and its parameters, like " [:code "(strong? ?e)"]
+   "), followed by the " [:em "body"] ": the clauses that must match. Rules are passed to the query as an input, "
    "using the special " [:code "%"] " binding, and invoked in " [:code ":where"] " like any other clause. "
    "In Clojure that looks like this:"]
   [:ui/code "clojure"
@@ -44,7 +44,7 @@
    "in multiple queries, or when you want to give a complex condition a meaningful name."]
 
   [:h2 "Multiple definitions: rule-level OR"]
-  [:p "A rule name can have more than one definition — sometimes called branches. "
+  [:p "A rule name can have more than one definition, sometimes called branches. "
    "Datomic treats them as a " [:em "disjunction"] ": "
    "the rule succeeds if " [:em "any"] " definition's body matches. "
    "This gives you named OR logic without repeating " [:code "or-join"] " everywhere:"]
@@ -82,14 +82,14 @@
      [?a :evolution/next ?b]
      (evolves-into? ?b ?c)]]]
   [:p "Ivysaur is a direct evolution, and Venusaur is reached through Ivysaur."]
-  [:p "One important role: a recursive rule needs a non-recursive definition — a " [:em "base case"]
-   " — to produce any results at all. A rule with only a recursive definition has nothing to "
+  [:p "One important role: a recursive rule needs a non-recursive definition, a " [:em "base case"]
+   ", to produce any results at all. A rule with only a recursive definition has nothing to "
    "recurse from, so it derives nothing. Termination isn't the base case's job: Datomic evaluates "
    "rules to a fixpoint regardless of shape, even one that cycles back on itself, stopping once a "
    "full pass through all definitions derives no new results."]
 
   [:h2 "Rules run in both directions"]
-  [:p "By default, a rule doesn't say which side is the input — though Datomic lets you declare "
+  [:p "By default, a rule doesn't say which side is the input, though Datomic lets you declare "
    "required bindings on a rule if you want to enforce one. "
    "The same " [:code "evolves-into?"] " rule can start from the descendant and find its ancestors:"]
   [:ui/runnable "pokemon"

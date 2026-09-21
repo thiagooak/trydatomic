@@ -82,13 +82,13 @@
     [$history ?tx :tx/generation ?generation]]
    (history)]
   [:p "Normal was added in Generation I. In Generation VI it was retracted and Fairy was added. "
-   "Datomic refuses any pattern that would scan every fact in the database "
-   "— in history or otherwise. Binding the entity, like we did above, is enough; "
+   "Datomic refuses any pattern that would scan every fact in the database, "
+   "in history or otherwise. Binding the entity, like we did above, is enough; "
    "only the attribute stays free."]
   [:ui/try-tip
    [:p "Remove the entity binding from the history query above, leaving "
     [:code "[$history ?e ?a ?v ?tx ?added]"] " on its own with nothing bound. "
-    "Datomic refuses to run it — that's the full-scan protection in action."]]
+    "Datomic refuses to run it. That's the full-scan protection in action."]]
 
   [:h2 "since"]
   [:p [:code "since"] " is the opposite of " [:code "as-of"] ": "

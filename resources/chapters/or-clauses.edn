@@ -2,7 +2,7 @@
  :content
  [:div
   [:h1 "Or Clauses"]
-  [:p "Pattern clauses in " [:code ":where"] " are implicitly joined with AND — every clause must match. "
+  [:p "Pattern clauses in " [:code ":where"] " are implicitly joined with AND: every clause must match. "
    "To express OR logic, Datomic Datalog provides " [:code "or"] " and " [:code "or-join"] "."]
 
   [:h2 "or"]
@@ -36,10 +36,9 @@
    [:code "?speed"] " is a local variable that lives only inside its branch."]
   [:ui/try-tip
    [:p "Change " [:code "or-join [?e]"] " above to plain " [:code "or"] " and run it. Datomic refuses: "
-    [:code "All clauses in 'or' must use same set of vars"] " — " [:code "?speed"] " only exists in the "
-    "second branch, so the two branches disagree on which variables they share. That's exactly what "
-    [:code "or-join"] " fixes."]]
-  [:ui/try-tip
-   [:p "Add a third " [:code "or"] " branch for \"Electric\" in the first query. "
+    [:code "All clauses in 'or' must use same set of vars"] ". " [:code "?speed"] " only exists in the "
+    "second branch, so the two branches disagree on which variables they share; "
+    [:code "or-join"] " gets around this by declaring up front which ones actually are shared. "
+    "Add a third " [:code "or"] " branch for \"Electric\" in the first query above. "
     "Or modify the " [:code "or-join"] " query to find Pokemon that are Ground-type "
     [:em "or"] " have attack above 120."]]]}

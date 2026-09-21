@@ -2,7 +2,7 @@
  :content
  [:div
   [:h1 "Cardinality Many"]
-  [:p "Most attributes hold a single value per entity — " [:code ":db.cardinality/one"] ". "
+  [:p "Most attributes hold a single value per entity: " [:code ":db.cardinality/one"] ". "
    "But " [:code ":pokemon/type"] " is declared " [:code ":db.cardinality/many"] " in "
    [:a {:href "/modeling-data"} "Modeling data"] ", "
    "meaning an entity can have multiple values for the same attribute."]
@@ -12,7 +12,7 @@
              :db/cardinality :db.cardinality/many}]
   [:p "The consequence for queries is important: "
    "binding a cardinality/many attribute produces " [:strong "one result row per value"] ". "
-   "Let's see it in action — run this query and notice how Bulbasaur appears twice:"]
+   "Let's see it in action. Run this query and notice how Bulbasaur appears twice:"]
   [:ui/runnable "pokemon"
    [:find ?name ?type
     :where
@@ -26,7 +26,7 @@
   [:p "We can use the multi-row behaviour to our advantage. "
    "By joining " [:code ":pokemon/type"] " to itself under two different variable names, "
    "we get all pairs of types on the same entity. "
-   "Filtering with " [:code "not="] " keeps only the pairs where the two values differ — "
+   "Filtering with " [:code "not="] " keeps only the pairs where the two values differ, "
    "that is, entities that carry at least two distinct types:"]
   [:ui/runnable "pokemon"
    [:find ?name
@@ -41,7 +41,7 @@
   [:h2 "Counting values with aggregation"]
   [:p "We can count how many type values each Pokemon has by using the "
    [:code "count"] " aggregate in " [:code ":find"] ". "
-   "Aggregates get their own " [:a {:href "/aggregations"} "chapter"] " later — for now just observe that "
+   "Aggregates get their own " [:a {:href "/aggregations"} "chapter"] " later. For now, just observe that "
    [:code "count"] " collapses all the type rows for one entity into a single number:"]
   [:ui/runnable "pokemon"
    [:find ?name (count ?type)

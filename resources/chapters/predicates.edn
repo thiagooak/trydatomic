@@ -6,7 +6,7 @@
    [:code "\"Bulbasaur\""] ". Predicates let us filter rows using arbitrary truthy expressions."]
   [:p "A predicate clause is a function call wrapped in an extra pair of brackets:"]
   [:ui/code "[( > ?speed 100 )]"]
-  [:p "Every variable used in the predicate must be bound somewhere in the query — not necessarily by an earlier clause. "
+  [:p "Every variable used in the predicate must be bound somewhere in the query, not necessarily by an earlier clause. "
    "A variable bound nowhere is the real error:"]
   [:ui/code "?nope not bound in expression clause: [(> ?nope 100)]"]
   [:p "Order still matters for two other reasons, though: data patterns run in the order written, so put the "

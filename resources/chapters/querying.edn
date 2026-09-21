@@ -18,7 +18,7 @@
   [:p "Each key is an " [:strong "Attribute"] " (:pokemon/name, :stat/speed, etc"
    ") and each value is the " [:strong "Value"] " for that attribute on this entity (Bulbasaur, 45, etc)."]
   [:p "Datomic assigns every entity a unique " [:strong "entity ID"] " when it is first added. "
-   "You never choose it — and because of that, code shouldn't store an entity id outside Datomic. "
+   "You never choose it, and because of that, code shouldn't store an entity id outside Datomic. "
    "The " [:a {:href "/relationships"} "Relationships"] " chapter shows how to identify an entity a "
    "different way, with a unique attribute instead. "
    "(See " [:a {:href "https://docs.datomic.com/whatis/data-model.html"} "the Datomic data model"] ".) "
@@ -61,4 +61,4 @@
    "It is written as one transaction for each game generation, which the "
    [:a {:href "/time-travel"} "Time travel"] " chapter explains."]
   [:p "Run the last query with a dual-typed Pokemon like \"Charizard\" and observe "
-   "how many attribute-value rows appear — one for each fact stored about that entity."]]}
+   "how many attribute-value rows appear: one for each fact stored about that entity."]]}

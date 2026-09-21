@@ -3,7 +3,7 @@
  [:div
   [:h1 "Aggregations"]
   [:p "Aggregation functions sit inside " [:code ":find"] " and collapse multiple rows into a single value. "
-   "Any non-aggregated variable in " [:code ":find"] " becomes a grouping key — "
+   "Any non-aggregated variable in " [:code ":find"] " becomes a grouping key, "
    "like SQL's " [:code "GROUP BY"] "."]
 
   [:h2 "count"]
@@ -32,7 +32,7 @@
    [:find (avg ?attack)
     :where
     [?e :stat/attack ?attack]]]
-  [:p "Now add up the HP of every Pokemon — a rough measure of total bulk across the Pokedex. "
+  [:p "Now add up the HP of every Pokemon, a rough measure of total bulk across the Pokedex. "
    "Before you run it, think about how many Pokemon there are and how much HP a typical one has, "
    "then guess the total:"]
   [:ui/runnable "pokemon"
@@ -67,8 +67,8 @@
     :where
     [?e :stat/attack ?attack]]]
   [:p "Compare it with the number you noted earlier: the average changed too. "
-   "A sum that is far too small is easy to notice, but an average that is a couple of points off "
-   "looks perfectly plausible. That is what makes this trap dangerous."]
+   "A sum that is far too small is easy to notice. A wrong average is harder to catch: "
+   "off by a couple of points, it still looks plausible."]
   [:p "The same thing happens with " [:code "count"] ". Compare these two queries. "
    "The first counts " [:em "distinct type strings"] " in the database:"]
   [:ui/runnable "pokemon"
@@ -110,7 +110,7 @@
     :where
     [?e :pokemon/type ?type]
     [?e :stat/speed ?speed]]]
-  [:p "Now the same query using " [:code "count-distinct"] " — for types where multiple Pokemon "
+  [:p "Now the same query using " [:code "count-distinct"] ". For types where multiple Pokemon "
    "share a speed value, the count will be lower:"]
   [:ui/runnable "pokemon"
    [:find ?type (count-distinct ?speed)

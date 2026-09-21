@@ -3,7 +3,7 @@
  [:div
   [:h1 "Pull Expressions"]
   [:p "Every query so far has listed each desired attribute as a separate " [:code ":find"] " variable. "
-   "Pull lets you retrieve a whole entity — or a chosen subset of its attributes — "
+   "Pull lets you retrieve a whole entity, or a chosen subset of its attributes, "
    "as a single map, without enumerating every binding explicitly."]
   [:p "The syntax is " [:code "(pull ?e pattern)"] " inside " [:code ":find"] ", "
    "where " [:code "pattern"] " is a vector of attribute keywords (or " [:code "[*]"] " for all of them)."]
@@ -63,7 +63,7 @@
                     :pokemon/type :stat/hp :stat/speed]) .
     :where
     [?e :pokemon/name "Pikachu"]]]
-  [:p "The result is a bare map — easy to pass directly to the rest of your application."]
+  [:p "The result is a bare map, easy to pass directly to the rest of your application."]
 
   [:h2 "Attribute options"]
   [:p "Wrap an attribute in a list to give it options. "

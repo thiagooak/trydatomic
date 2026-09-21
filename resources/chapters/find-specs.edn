@@ -49,14 +49,14 @@
 
   [:h2 "Scalar — single value"]
   [:p "Append " [:code "."] " after the variable to return exactly one value instead of a collection. "
-   "When multiple rows match, which one you get is arbitrary — "
+   "When multiple rows match, which one you get is arbitrary, "
    "so scalars are most useful with aggregations that already produce a single row, "
    "like " [:code "(max ...)"] ":"]
   [:ui/runnable "pokemon"
    [:find (max ?speed) .
     :where
     [?e :stat/speed ?speed]]]
-  [:p "Without the " [:code "."] " this would return " [:code "[[150]]"] " — "
+  [:p "Without the " [:code "."] " this would return " [:code "[[150]]"] ": "
    "a collection containing one single-element tuple. "
    "With it you get the bare number " [:code "150"] "."]
 
