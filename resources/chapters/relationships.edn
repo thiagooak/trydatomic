@@ -46,8 +46,8 @@
   [:h2 "Joining by value"]
   [:p "A Pokemon's types are plain strings, like " [:code "\"Ghost\""] ", and a type entity has the same string in "
    [:code ":type/name"] ". We didn't need a reference between them. "
-   "Datalog joins on any equal values: when two clauses use the same variable, "
-   "they have to agree on it, whether it is an entity id or a string."]
+   "As we saw in " [:a {:href "/anatomy-of-a-query"} "Anatomy of a query"] ", two clauses that use the same variable "
+   "have to agree on it. That works on any equal values, whether it is an entity id or a string."]
   [:p "That lets a query hop across three kinds of links. "
    "Which Pokemon hit Gengar super-effectively? "
    "Gengar's type strings lead to their type entities (by value), "

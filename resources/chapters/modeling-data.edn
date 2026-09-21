@@ -124,10 +124,13 @@
     :where [?e :pokemon/type "Ghost"]
     [?e :pokemon/name ?name]]]
 
+  [:p "Don't worry yet about how this query is put together. "
+   "The next chapter, " [:a {:href "/anatomy-of-a-query"} "Anatomy of a query"] ", takes it apart."]
+
   [:ui/try-tip
    [:p "Edit the query above to also return each Pokemon's number. "
-    "Then find the Pokemon that are both Fire and Flying, using two " [:code ":pokemon/type"]
-    " clauses that share " [:code "?e"] "."]]
+    "Copy the last pattern, change its attribute to " [:code ":pokemon/number"] " and its variable to "
+    [:code "?number"] ", and add " [:code "?number"] " to " [:code ":find"] "."]]
 
   [:h2 "Bonus: no NULLs"]
   [:p "In SQL, a column that only some rows use is filled with NULL for the rest. "

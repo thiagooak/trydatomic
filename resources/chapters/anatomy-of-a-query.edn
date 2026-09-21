@@ -1,0 +1,68 @@
+{:nav-title "Anatomy of a query"
+ :content
+ [:div
+  [:h1 "Anatomy of a Query"]
+  [:p "You have already run a query. Before writing more of them, let's name their parts, "
+   "so you can read any query and reason about it. This is the query from the first page, "
+   "with each part labelled:"]
+  [:ui/code "clojure"
+   "[:find ?name                       ;; what to return
+ :where                            ;; what the data must match
+ [?entity :pokemon/type \"Grass\"]   ;; pattern 1
+ [?entity :pokemon/name ?name]]    ;; pattern 2"]
+
+  [:ul
+   [:li [:code ":find"] " says what to return. Here, one value per result: " [:code "?name"] "."]
+   [:li [:code ":where"] " lists the " [:strong "data patterns"] " the database has to match."]
+   [:li "A " [:strong "data pattern"] " has the shape " [:code "[entity attribute value]"]
+    ", like one row of the table in the previous chapter. Each slot holds either a fixed value, "
+    "like " [:code ":pokemon/type"] " or " [:code "\"Grass\""] ", or a variable."]
+   [:li "A " [:strong "logic variable"] " starts with " [:code "?"] ". It is a name for whatever fits, "
+    "and it has to mean " [:strong "the same thing everywhere it appears"] " in the query."]]
+
+  [:h2 "Read it aloud"]
+  [:p "Read a query as a sentence: " [:em "\"Find the " [:code "?name"] " of every " [:code "?entity"]
+                                      " that has the type Grass and that has the name " [:code "?name"] ".\""]
+   " The first pattern picks the Grass entities, and the second reads their names."]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?entity :pokemon/type "Grass"]
+    [?entity :pokemon/name ?name]]]
+
+  [:h2 "Sharing a variable is a join"]
+  [:p "Both patterns above use " [:code "?entity"] ", so they describe the same entity. "
+   "Datomic finds the entities that match the first pattern and keeps the ones that also match the second. "
+   "This is the job " [:code "JOIN ... ON"] " did in the SQL of the previous chapter, "
+   "and here the shared variable is all it takes."]
+  [:p "Let's use it to find the Pokemon that are both Fire and Flying. "
+   "Two patterns on " [:code ":pokemon/type"] ", one variable:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?e :pokemon/type "Fire"]
+    [?e :pokemon/type "Flying"]
+    [?e :pokemon/name ?name]]]
+  [:p "Now give the second pattern a variable of its own. "
+   [:code "?flyer"] " is not " [:code "?fire"] ", so the two patterns are unrelated. "
+   "The second one only asks whether some Flying Pokemon exists, and one does, "
+   "so it filters nothing. Every Fire Pokemon comes back:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?fire :pokemon/type "Fire"]
+    [?flyer :pokemon/type "Flying"]
+    [?fire :pokemon/name ?name]]]
+  [:p "If two patterns are about the same thing, they have to share a variable."]
+
+  [:h2 "Two more things to know"]
+  [:ul
+   [:li "The patterns in " [:code ":where"] " are combined with AND. "
+    "A result has to satisfy every one of them."]
+   [:li "The result is a collection of tuples with no duplicates and no promised order. "
+    "Two Pokemon that share the values you return give one row, not two. That matters when we count "
+    "in the " [:a {:href "/aggregations"} "Aggregations"] " chapter."]]
+
+  [:ui/try-tip
+   [:p "Find the Pokemon that are both Water and Ice. "
+    "Then rename the variable in one of the type patterns, and predict how the result changes before you run it."]]]}

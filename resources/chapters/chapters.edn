@@ -1,5 +1,6 @@
 ["index"
  "modeling-data"
+ "anatomy-of-a-query"
  "querying"
  "predicates"
  "function-clauses"
