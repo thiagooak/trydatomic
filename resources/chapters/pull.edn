@@ -41,17 +41,38 @@
     [?e :stat/speed ?speed]
     [(> ?speed 100)]]]
 
+  [:h2 "Pull keeps entities that a join would drop"]
+  [:p "The " [:a {:href "/modeling-data"} "Modeling data"] " chapter showed that a join silently drops any entity "
+   "missing one of its attributes. Only 4 Pokemon have a " [:code ":pokemon/category"] ", so joining it returns "
+   "only those 4 names:"]
+  [:ui/runnable "pokemon"
+   [:find ?name
+    :where
+    [?e :pokemon/name ?name]
+    [?e :pokemon/category ?category]]]
+  [:p "Pull instead keeps every entity, whether or not it has the attribute, with the key simply absent "
+   "when there is nothing to pull. Wrapping the pull in a collection find spec (" [:code "[...]"] ") "
+   "returns one map per entity, the form you will reach for most often in real code:"]
+  [:ui/runnable "pokemon"
+   [:find [(pull ?e [:pokemon/name :pokemon/category]) ...]
+    :where
+    [?e :pokemon/name _]]]
+  [:p "All " [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/name _]]] " Pokemon come back, "
+   "most without a " [:code ":pokemon/category"] " key at all. "
+   [:code "get-else"] ", from " [:a {:href "/function-clauses"} "Function clauses"] ", fills in a default "
+   "for a join; pull's own " [:code ":default"] " option below does the same."]
+
   [:h2 "Wildcard pull"]
   [:p "Use " [:code "[*]"] " to pull every attribute on the entity, "
    "including Datomic's own " [:code ":db/id"] ":"]
   [:ui/runnable "pokemon"
    [:find (pull ?e [*])
     :where
-    [?e :pokemon/name "Charizard"]]]
+    [?e :pokemon/name "Pikachu"]]]
   [:p "The wildcard is handy for exploration and debugging. "
    "In production code, prefer listing attributes explicitly "
    "so the shape of your data is clear and stable."]
-  [:p "For a Pokemon that evolves, like Pikachu, a wildcard pull also returns " [:code ":evolution/next"] ". "
+  [:p "Pikachu evolves, so its wildcard pull also returns " [:code ":evolution/next"] ". "
    "That attribute is a reference to another entity, so all a wildcard gives you is its " [:code ":db/id"] ". "
    "The sections below show how to follow it."]
 
@@ -63,7 +84,10 @@
                     :pokemon/type :stat/hp :stat/speed]) .
     :where
     [?e :pokemon/name "Pikachu"]]]
-  [:p "The result is a bare map, easy to pass directly to the rest of your application."]
+  [:p "The result is a bare map, easy to pass directly to the rest of your application. "
+   "Note that " [:code ":pokemon/type"] " comes back as " [:code "[\"Electric\"]"]
+   ", a vector, even though Pikachu has only one. Pull always returns a cardinality-many "
+   "attribute as a collection, no matter how many values the entity actually has."]
 
   [:h2 "Attribute options"]
   [:p "Wrap an attribute in a list to give it options. "
