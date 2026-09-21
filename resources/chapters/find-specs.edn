@@ -28,7 +28,7 @@
 
   [:h2 "Relation (default) — collection of tuples"]
   [:p "The standard form. Each variable becomes a column; each matching combination becomes a row. "
-   "Order within the set is not guaranteed."]
+   "Order among the rows is not guaranteed."]
   [:ui/runnable "pokemon"
    [:find ?name ?speed
     :where

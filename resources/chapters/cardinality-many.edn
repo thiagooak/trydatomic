@@ -35,7 +35,7 @@
     [?e :pokemon/type ?type1]
     [?e :pokemon/type ?type2]
     [(not= ?type1 ?type2)]]]
-  [:p "Because " [:code ":find"] " returns a " [:strong "set"] " of tuples, each name appears only once "
+  [:p "Because " [:code ":find"] " removes duplicate rows, each name appears only once "
    "even though many " [:code "(?type1, ?type2)"] " combinations matched."]
 
   [:h2 "Counting values with aggregation"]
