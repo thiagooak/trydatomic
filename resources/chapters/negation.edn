@@ -24,7 +24,8 @@
    "inside the negation that are only used there. "
    "You declare explicitly which outer variables to join."]
   [:p "Here we find " [:strong "single-type Pokemon"] " — those for which there is no second, "
-   "different type value:"]
+   "different type value. It reuses the " [:code "not="] " comparison from "
+   [:a {:href "/cardinality-many"} "Cardinality many"] ":"]
   [:ui/runnable "pokemon"
    [:find ?name ?type
     :where
@@ -44,6 +45,8 @@
    [:code ":pokemon/category"] ", with the value " [:code ":legendary"] ". "
    "In Datomic any entity can have any attribute, so for every other Pokemon that fact simply "
    "doesn't exist: they are " [:em "missing"] " the attribute. "
+   "Where " [:code "get-else"] " in " [:a {:href "/function-clauses"} "Function clauses"]
+   " kept those Pokemon and gave them a default, " [:code "missing?"] " keeps only them. "
    "Let's find all non-legendary Pokemon:"]
   [:ui/runnable "pokemon"
    [:find ?name

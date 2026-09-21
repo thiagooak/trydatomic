@@ -2,8 +2,9 @@
  :content
  [:div
   [:h1 "Modeling Data"]
-  [:p "To understand Datomic's data model, we will compare it with a relational database, "
-   "using a small slice of our Pokemon data."]
+  [:p "So far we have queried data that was already in the database. "
+   "Now let's see how it got there. To understand Datomic's data model, "
+   "we will compare it with a relational database, using a small slice of our Pokemon data."]
   [:p "In SQL we would need two tables. A Pokemon has one or two types, "
    "so the types can't live in a single column of the " [:code "pokemon"] " table. "
    "They go in a second table that points back to it."]
@@ -124,8 +125,9 @@
     :where [?e :pokemon/type "Ghost"]
     [?e :pokemon/name ?name]]]
 
-  [:p "Don't worry yet about how this query is put together. "
-   "The next chapter, " [:a {:href "/anatomy-of-a-query"} "Anatomy of a query"] ", takes it apart."]
+  [:p "As in " [:a {:href "/anatomy-of-a-query"} "Anatomy of a query"] ", the shared variable " [:code "?e"]
+   " ties the two patterns to the same Pokemon. It does the job of the " [:code "JOIN ... ON"]
+   " in the SQL above, without a second table."]
 
   [:ui/try-tip
    [:p "Edit the query above to also return each Pokemon's number. "

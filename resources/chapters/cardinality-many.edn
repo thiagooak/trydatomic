@@ -3,7 +3,8 @@
  [:div
   [:h1 "Cardinality Many"]
   [:p "Most attributes hold a single value per entity — " [:code ":db.cardinality/one"] ". "
-   "But " [:code ":pokemon/type"] " is declared " [:code ":db.cardinality/many"] ", "
+   "But " [:code ":pokemon/type"] " is declared " [:code ":db.cardinality/many"] " in "
+   [:a {:href "/modeling-data"} "Modeling data"] ", "
    "meaning an entity can have multiple values for the same attribute."]
   [:p "In the schema this looks like:"]
   [:ui/code {:db/ident       :pokemon/type
@@ -17,10 +18,9 @@
     :where
     [?e :pokemon/name ?name]
     [?e :pokemon/type ?type]
-    (or [?e :pokemon/name "Bulbasaur"]
-        [?e :pokemon/name "Charmander"])]]
+    [(= ?name "Bulbasaur")]]]
   [:p "Bulbasaur has two type values (Grass and Poison) so it produces two rows. "
-   "Charmander is pure Fire so it produces one."]
+   "A pure Fire Pokemon like Charmander produces only one."]
 
   [:h2 "Finding dual-type Pokemon"]
   [:p "We can use the multi-row behaviour to our advantage. "
@@ -41,7 +41,7 @@
   [:h2 "Counting values with aggregation"]
   [:p "We can count how many type values each Pokemon has by using the "
    [:code "count"] " aggregate in " [:code ":find"] ". "
-   "This is a preview of the next chapter — for now just observe that "
+   "Aggregates get their own " [:a {:href "/aggregations"} "chapter"] " later — for now just observe that "
    [:code "count"] " collapses all the type rows for one entity into a single number:"]
   [:ui/runnable "pokemon"
    [:find ?name (count ?type)
@@ -53,4 +53,4 @@
   [:ui/try-tip
    [:p "Modify the dual-type query to also return " [:code "?type1"] " and "
     [:code "?type2"] " in " [:code ":find"] " to see which type combinations appear. "
-    "Or change the " [:code "or"] " filter in the first query to show Bulbasaur and Pikachu side by side."]]]}
+    "Or change \"Bulbasaur\" in the first query to \"Charmander\" and compare the number of rows."]]]}

@@ -15,7 +15,8 @@
    [:li [:code ":find"] " says what to return. Here, one value per result: " [:code "?name"] "."]
    [:li [:code ":where"] " lists the " [:strong "data patterns"] " the database has to match."]
    [:li "A " [:strong "data pattern"] " has the shape " [:code "[entity attribute value]"]
-    ", like one row of the table in the previous chapter. Each slot holds either a fixed value, "
+    ", one fact about one entity, like the " [:code ":pokemon/name"] " of Bulbasaur in the previous chapter. "
+    "Each slot holds either a fixed value, "
     "like " [:code ":pokemon/type"] " or " [:code "\"Grass\""] ", or a variable."]
    [:li "A " [:strong "logic variable"] " starts with " [:code "?"] ". It is a name for whatever fits, "
     "and it has to mean " [:strong "the same thing everywhere it appears"] " in the query."]]
@@ -33,7 +34,7 @@
   [:h2 "Sharing a variable is a join"]
   [:p "Both patterns above use " [:code "?entity"] ", so they describe the same entity. "
    "Datomic finds the entities that match the first pattern and keeps the ones that also match the second. "
-   "This is the job " [:code "JOIN ... ON"] " did in the SQL of the previous chapter, "
+   "If you know SQL, this is what " [:code "JOIN ... ON"] " does, "
    "and here the shared variable is all it takes."]
   [:p "Let's use it to find the Pokemon that are both Fire and Flying. "
    "Two patterns on " [:code ":pokemon/type"] ", one variable:"]

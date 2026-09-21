@@ -2,7 +2,7 @@
  :content
  [:div
   [:h1 "Filtering with Predicates"]
-  [:p "In the previous chapter we matched patterns by specifying exact values like "
+  [:p "So far we matched patterns by specifying exact values like "
    [:code "\"Bulbasaur\""] ". Predicates let us filter rows using arbitrary truthy expressions."]
   [:p "A predicate clause is a function call wrapped in an extra pair of brackets:"]
   [:ui/code "[( > ?speed 100 )]"]
@@ -23,6 +23,8 @@
     [?e :stat/attack ?attack]
     [?e :stat/defense ?defense]
     [(> ?defense ?attack)]]]
+  [:p [:code "not="] " is a predicate too: " [:code "[(not= ?a ?b)]"] " keeps a row only if the two values differ. "
+   "The next chapter puts it to use."]
   [:p "Predicates work on strings too, this site allows "
    [:code "clojure.string/starts-with?"] " and " [:code "clojure.string/includes?"]
    "; in a real Datomic app, any Clojure function is available. "

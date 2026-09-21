@@ -50,7 +50,8 @@
     [?e :pokemon/name ?name]
     [(str "#" ?number " " ?name) ?label]]]
   [:p [:code "subs"] " takes part of a string, from a start index up to (but not including) an end index. "
-   "Bound values can be grouped like any variable, so we can count how many Pokemon start with each letter. "
+   "Bound values can be grouped like any variable, so we can use " [:code "count"]
+   ", as in " [:a {:href "/cardinality-many"} "Cardinality many"] ", to see how many Pokemon start with each letter. "
    "Datalog groups by everything in " [:code ":find"] " that isn't an aggregate:"]
   [:ui/runnable "pokemon"
    [:find ?initial (count ?e)
@@ -69,8 +70,8 @@
     :where
     [?e :pokemon/name _]
     [(get-else $ ?e :pokemon/category :regular) ?category]]]
-  [:p "Compare it with " [:code "missing?"] " from the " [:a {:href "/negation"} "Negation"]
-   " chapter, which keeps only the Pokemon that lack the attribute."]
+  [:p "The next chapter, " [:a {:href "/negation"} "Negation"] ", shows the opposite: "
+   [:code "missing?"] " keeps only the Pokemon that lack the attribute."]
 
   [:ui/try-tip
    [:p "Lower the total in the first query to " [:code "580"] " to see the legendary birds join the list. "

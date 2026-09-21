@@ -15,7 +15,8 @@
     :where
     [?entity :pokemon/type "Grass"]
     [?entity :pokemon/name ?name]]]
-  [:p "That was a query. We will look at how the data is stored first, "
-   "and then at how a query is put together."]
+  [:p "That was a query. We will look at the facts it matched first, "
+   "then at how a query is put together, "
+   "and last at how the data got into the database."]
   [:ui/try-tip
    [:p "Edit the query above to return Pokémon of other types like Fire or Electric."]]]}
