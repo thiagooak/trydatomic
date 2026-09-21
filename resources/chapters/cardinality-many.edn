@@ -23,27 +23,35 @@
    "By joining " [:code ":pokemon/type"] " to itself under two different variable names, "
    "we get all pairs of types on the same entity. "
    "Filtering with " [:code "not="] " keeps only the pairs where the two values differ, "
-   "that is, entities that carry at least two distinct types:"]
+   "that is, entities that carry at least two distinct types. Restricting to speed above 100 "
+   "keeps the result to a screenful:"]
   [:ui/runnable "pokemon"
    [:find ?name
     :where
     [?e :pokemon/name ?name]
     [?e :pokemon/type ?type1]
     [?e :pokemon/type ?type2]
+    [?e :stat/speed ?speed]
+    [(> ?speed 100)]
     [(not= ?type1 ?type2)]]]
   [:p "Because " [:code ":find"] " removes duplicate rows, each name appears only once "
-   "even though many " [:code "(?type1, ?type2)"] " combinations matched."]
+   "even though many " [:code "(?type1, ?type2)"] " combinations matched. There are "
+   [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/type ?type1] [?e :pokemon/type ?type2] [(not= ?type1 ?type2)]]]
+   " dual-type Pokemon in total; the speed filter above only shows the faster ones."]
 
   [:h2 "Counting values with aggregation"]
   [:p "We can count how many type values each Pokemon has by using the "
    [:code "count"] " aggregate in " [:code ":find"] ". "
    "Aggregates get their own " [:a {:href "/aggregations"} "chapter"] " later. For now, just observe that "
-   [:code "count"] " collapses all the type rows for one entity into a single number:"]
+   [:code "count"] " collapses all the type rows for one entity into a single number. "
+   "Restricting to speed above 100 again keeps the result to a screenful:"]
   [:ui/runnable "pokemon"
    [:find ?name (count ?type)
     :where
     [?e :pokemon/name ?name]
-    [?e :pokemon/type ?type]]]
+    [?e :pokemon/type ?type]
+    [?e :stat/speed ?speed]
+    [(> ?speed 100)]]]
   [:p "Pokemon with a count of 2 are dual-typed. Those with 1 are single-typed."]
   [:ui/try-tip
    [:p "Modify the dual-type query to also return " [:code "?type1"] " and "

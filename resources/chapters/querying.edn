@@ -37,6 +37,8 @@
     [?entity-id ?attribute-id _]
     [?attribute-id :db/ident ?attribute]]]
   [:p "The underscore " [:code "_"] " in the third position is a wildcard, it matches any value but does not bind it to a variable."]
+  [:p "Rows come back in no particular order, this one especially, since it reflects internal ids "
+   "rather than anything meaningful. Sort the results yourself, in whatever reads them, if order matters."]
   [:p "Finally, we can pull all attribute-value pairs at once by binding the value position too:"]
   [:ui/runnable "pokemon"
    [:find ?attribute ?value

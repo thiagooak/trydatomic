@@ -11,32 +11,39 @@
    "Variables already bound in the outer query are automatically joined, but that's the only kind of "
    "variable a plain " [:code "not"] " can use. Every variable inside it must already be bound outside; "
    "there's no way to introduce a new one that stays local to the negation. "
-   "Let's find Pokemon that are not Grass type:"]
+   "Let's find Poison-type Pokemon that are not also Grass:"]
   [:ui/runnable "pokemon"
    [:find ?name
     :where
     [?e :pokemon/name ?name]
+    [?e :pokemon/type "Poison"]
     (not [?e :pokemon/type "Grass"])]]
   [:p "Because " [:code ":pokemon/type"] " is " [:code ":db.cardinality/many"] ", this excludes Pokemon that have "
-   [:em "any"] " Grass entry, so Bulbasaur (Grass/Poison) is excluded. "
-   "Try changing \"Grass\" to \"Fire\" or \"Water\"."]
+   [:em "any"] " Grass entry, not only pure Grass ones. Bulbasaur, Oddish, Bellsprout and every other "
+   "Poison/Grass Pokemon are excluded, leaving only the Poison types that aren't also Grass. "
+   "Try changing \"Poison\" to another type, or \"Grass\" in the " [:code "not"] " to \"Fire\" or \"Water\"."]
 
   [:h2 "not-join"]
   [:p "Here we want to find " [:strong "single-type Pokemon"] ": those for which there is no second, "
    "different type value. It reuses the " [:code "not="] " comparison from "
    [:a {:href "/cardinality-many"} "Cardinality many"] ". The check needs " [:code "?other"]
-   ", a variable that only makes sense inside the negation:"]
+   ", a variable that only makes sense inside the negation. Restricting to speed above 100 "
+   "keeps the result to a screenful:"]
   [:ui/runnable "pokemon"
    [:find ?name ?type
     :where
     [?e :pokemon/name ?name]
     [?e :pokemon/type ?type]
+    [?e :stat/speed ?speed]
+    [(> ?speed 100)]
     (not-join [?e ?type]
               [?e :pokemon/type ?other]
               [(not= ?type ?other)])]]
   [:p "For each " [:code "?name"] "/" [:code "?type"] " pair, "
    [:code "not-join"] " checks whether a different type value " [:code "?other"] " exists on the same entity. "
-   "If it does, the row is dropped, leaving only single-type Pokemon."]
+   "If it does, the row is dropped. There are "
+   [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/name ?name] [?e :pokemon/type ?type] (not-join [?e ?type] [?e :pokemon/type ?other] [(not= ?type ?other)])]]
+   " single-type Pokemon in total; the speed filter above only shows the faster ones."]
   [:ui/try-tip
    [:p "Before running the next thing, predict: change " [:code "not-join [?e ?type]"] " above to plain "
     [:code "not"] " and run it. Datomic refuses: " [:code "?other not bound in not clause"]
@@ -59,18 +66,20 @@
    "doesn't exist: they are " [:em "missing"] " the attribute. "
    "Where " [:code "get-else"] " in " [:a {:href "/function-clauses"} "Function clauses"]
    " kept those Pokemon and gave them a default, " [:code "missing?"] " keeps only them. "
-   "Let's find all non-legendary Pokemon:"]
+   "Let's find non-legendary Pokemon with speed above 100, to keep the result to a screenful:"]
   [:ui/runnable "pokemon"
    [:find ?name
     :where
     [?e :pokemon/name ?name]
+    [?e :stat/speed ?speed]
+    [(> ?speed 100)]
     [(missing? $ ?e :pokemon/category)]]]
-  [:p "This returns all "
+  [:p "There are "
    [:ui/value "pokemon" [:find (count ?e) . :where [?e :pokemon/name _] [(missing? $ ?e :pokemon/category)]]]
-   " Pokemon that lack the " [:code ":pokemon/category"] " attribute. "
-   "Try adding a stat like " [:code "[?e :stat/hp ?hp]"] " and including " [:code "?hp"]
-   " in " [:code ":find"] ". " [:code "missing?"] " only filters; the rest of the query works normally."]
+   " Pokemon in total that lack the " [:code ":pokemon/category"] " attribute; the speed filter above "
+   "only shows the faster ones. " [:code "missing?"] " only filters; the rest of the query works normally."]
   [:ui/try-tip
-   [:p "Modify the " [:code "not"] " query at the top to exclude a different type, like \"Ice\" or \"Dragon\". "
+   [:p "Change \"Poison\" and \"Grass\" in the " [:code "not"] " query at the top to another pair, "
+    "like \"Water\" and \"Ice\". "
     "Or flip the " [:code "missing?"] " demo to find " [:em "legendary"] " Pokemon by replacing "
     [:code "missing?"] " with a data pattern " [:code "[?e :pokemon/category :legendary]"] "."]]]}

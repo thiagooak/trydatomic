@@ -24,14 +24,19 @@
     [:ui/value "pokemon" [:find (count ?e) . :where [?e :stat/speed ?speed] [(> ?speed 100)]]]
     " Pokemon."]]
   [:p "We can compare two bound variables against each other. "
-   "Here are the Pokemon whose defense is strictly higher than their attack:"]
+   "Here are the Pokemon whose defense is strictly higher than their attack, restricted to attack above 70 "
+   "to keep the result to a screenful:"]
   [:ui/runnable "pokemon"
    [:find ?name ?attack ?defense
     :where
     [?e :pokemon/name ?name]
     [?e :stat/attack ?attack]
     [?e :stat/defense ?defense]
+    [(> ?attack 70)]
     [(> ?defense ?attack)]]]
+  [:p "There are "
+   [:ui/value "pokemon" [:find (count ?e) . :where [?e :stat/attack ?attack] [?e :stat/defense ?defense] [(> ?defense ?attack)]]]
+   " Pokemon in total where defense beats attack; the threshold above only shows the ones with higher attack too."]
   [:p [:code "not="] " is a predicate too: " [:code "[(not= ?a ?b)]"] " keeps a row only if the two values differ. "
    "The next chapter puts it to use."]
   [:p "Predicates work on strings too, this site allows "
