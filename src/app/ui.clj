@@ -309,6 +309,18 @@
     }} "TRY"]
     tip])
 
+(defn notice
+  [content]
+  [:div {:class "notice"}
+    [:span {:style {
+      :font-size "0.75rem"
+      :font-weight "700"
+      :letter-spacing "0.1em"
+      :text-transform "uppercase"
+      :line-height "1.2"
+    }} "NOTE"]
+    content])
+
 (defn not-found
   "The page for a path that isn't a chapter. `slug` is whatever was asked for."
   []

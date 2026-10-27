@@ -74,9 +74,18 @@
    [:tr [:td "1002"] [:td ":stat/hp"] [:td "35"]]
    [:tr [:td "1002"] [:td ":pokemon/type"] [:td "Electric"]]]
 
-  [:p "Notice that Gastly has two rows for " [:code ":pokemon/type"] ": the same Entity and the same Attribute, "
+  [:p "Gastly has two rows for " [:code ":pokemon/type"] ": the same Entity and the same Attribute, "
    "with a different Value. There is no second table to join. The ids above are just for illustration, "
    "Datomic assigns them for you."]
+
+  [:ui/notice
+   [:div
+    [:p "Facts about Gastly are independent from each other. The only thing tying them into something "
+     "we identify as a Pokemon is that all five facts happen to share the same Entity-id."]
+    [:p "It can be helpful to think of data in Datomic in the spirit of "
+     [:a {:href "https://en.wikipedia.org/wiki/Resource_Description_Framework"} "RDF triples"]
+     ". A fact connects an Entity to a Value, or, as the " [:a {:href "/relationships"} "Relationships"]
+     " chapter shows, to another Entity."]]]
 
   [:p "Let's implement it."]
 

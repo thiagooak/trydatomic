@@ -5,8 +5,8 @@
   a map {:nav-title \"...\" :content <hiccup>}, named after its slug.
 
   Hiccup in :content may use [:ui/runnable ...], [:ui/code ...],
-  [:ui/try-tip ...] and [:ui/value ...]. Those are expanded by calling the
-  matching function."
+  [:ui/try-tip ...], [:ui/notice ...] and [:ui/value ...]. Those are expanded
+  by calling the matching function."
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.string :as str]
@@ -29,6 +29,7 @@
   {:ui/runnable #'ui/runnable
    :ui/code     #'ui/code
    :ui/try-tip  #'ui/try-tip
+   :ui/notice   #'ui/notice
    :ui/value    #'value})
 
 (defn- component? [form]
